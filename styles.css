@@ -257,7 +257,7 @@ body {
     line-height: 1.1;
     color: var(--color-black);
     margin: 0;
-    letter-spacing: -5%;
+    letter-spacing: -10%;
 }
 
 .hero-title-word {
