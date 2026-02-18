@@ -424,88 +424,12 @@ function initParticleSwell() {
 // ============================================
 
 function initSVGBreathing() {
-    // Get all hero sections that should have breathing (hero-section without hero-2 or hero-no-breathing class)
-    const heroSections = document.querySelectorAll('.hero-section:not(.hero-2):not(.hero-no-breathing)');
+    // Apply breathing animation to all SVGs that should have it
+    const svgs = document.querySelectorAll('.hero-svg:not(.hero-no-breathing .hero-svg)');
     
-    heroSections.forEach((section, sectionIndex) => {
-        const bottomLeftImg = section.querySelector('.hero-svg-bottom-left');
-        const topRightImg = section.querySelector('.hero-svg-top-right');
-        
-        // Apply breathing to bottom-left SVG
-        if (bottomLeftImg) {
-            fetch('assets/svg/bottom-left-new.svg')
-                .then(response => response.text())
-                .then(svgContent => {
-                    const svgWrapper = document.createElement('div');
-                    svgWrapper.innerHTML = svgContent;
-                    const inlineSvg = svgWrapper.querySelector('svg');
-                    
-                    inlineSvg.classList.add('hero-svg', 'hero-svg-bottom-left');
-                    inlineSvg.style.cssText = bottomLeftImg.getAttribute('style') || '';
-                    
-                    bottomLeftImg.replaceWith(inlineSvg);
-                    
-                    const allLayers = inlineSvg.querySelectorAll('[id^="Layer_"]');
-                    let totalCircles = 0;
-                    
-                    allLayers.forEach(layer => {
-                        const circles = layer.querySelectorAll('circle');
-                        circles.forEach(circle => {
-                            const cx = circle.getAttribute('cx');
-                            const cy = circle.getAttribute('cy');
-                            const randomDuration = (Math.random() * 3 + 2).toFixed(2);
-                            const randomDelay = (Math.random() * 2).toFixed(2);
-                            
-                            circle.style.transformOrigin = `${cx}px ${cy}px`;
-                            circle.style.animationDuration = `${randomDuration}s`;
-                            circle.style.animationDelay = `${randomDelay}s`;
-                            circle.classList.add('breathing-circle');
-                            totalCircles++;
-                        });
-                    });
-                    
-                    console.log(`✓ Section ${sectionIndex + 1} Bottom-left: Breathing applied to ${totalCircles} circles`);
-                })
-                .catch(err => console.error('Error loading bottom-left SVG:', err));
-        }
-        
-        // Apply breathing to top-right SVG
-        if (topRightImg) {
-            fetch('assets/svg/top-right-new.svg')
-                .then(response => response.text())
-                .then(svgContent => {
-                    const svgWrapper = document.createElement('div');
-                    svgWrapper.innerHTML = svgContent;
-                    const inlineSvg = svgWrapper.querySelector('svg');
-                    
-                    inlineSvg.classList.add('hero-svg', 'hero-svg-top-right');
-                    inlineSvg.style.cssText = topRightImg.getAttribute('style') || '';
-                    
-                    topRightImg.replaceWith(inlineSvg);
-                    
-                    const allLayers = inlineSvg.querySelectorAll('[id^="Layer_"]');
-                    let totalCircles = 0;
-                    
-                    allLayers.forEach(layer => {
-                        const circles = layer.querySelectorAll('circle');
-                        circles.forEach(circle => {
-                            const cx = circle.getAttribute('cx');
-                            const cy = circle.getAttribute('cy');
-                            const randomDuration = (Math.random() * 3 + 2).toFixed(2);
-                            const randomDelay = (Math.random() * 2).toFixed(2);
-                            
-                            circle.style.transformOrigin = `${cx}px ${cy}px`;
-                            circle.style.animationDuration = `${randomDuration}s`;
-                            circle.style.animationDelay = `${randomDelay}s`;
-                            circle.classList.add('breathing-circle');
-                            totalCircles++;
-                        });
-                    });
-                    
-                    console.log(`✓ Section ${sectionIndex + 1} Top-right: Breathing applied to ${totalCircles} circles`);
-                })
-                .catch(err => console.error('Error loading top-right SVG:', err));
-        }
+    svgs.forEach((svg, index) => {
+        svg.classList.add('breathing-svg');
+        console.log(`✓ SVG ${index + 1}: Breathing animation applied`);
     });
 }
 
