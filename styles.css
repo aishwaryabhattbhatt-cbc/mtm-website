@@ -177,6 +177,13 @@ body {
     transform: scale(0.85);
 }
 
+/* GSAP breathing animation setup for circles */
+svg .breath-circle {
+    transform-box: fill-box;
+    transform-origin: center center;
+    will-change: transform;
+}
+
 .hero-svg-top-right {
     top: 0;
     right: 0;
