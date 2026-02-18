@@ -424,12 +424,85 @@ function initParticleSwell() {
 // ============================================
 
 function initSVGBreathing() {
-    // Apply breathing animation to all SVGs that should have it
-    const svgs = document.querySelectorAll('.hero-svg:not(.hero-no-breathing .hero-svg)');
+    const heroSections = document.querySelectorAll('.hero-section:not(.hero-2):not(.hero-no-breathing)');
     
-    svgs.forEach((svg, index) => {
-        svg.classList.add('breathing-svg');
-        console.log(`✓ SVG ${index + 1}: Breathing animation applied`);
+    heroSections.forEach((section, sectionIndex) => {
+        const bottomLeftImg = section.querySelector('.hero-svg-bottom-left');
+        const topRightImg = section.querySelector('.hero-svg-top-right');
+        
+        // Fetch and inline bottom-left SVG
+        if (bottomLeftImg && bottomLeftImg.tagName === 'IMG') {
+            const svgUrl = bottomLeftImg.src;
+            fetch(svgUrl)
+                .then(response => response.text())
+                .then(svgContent => {
+                    const parser = new DOMParser();
+                    const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
+                    const inlineSvg = svgDoc.documentElement;
+                    
+                    inlineSvg.classList.add('hero-svg', 'hero-svg-bottom-left');
+                    inlineSvg.style.cssText = bottomLeftImg.getAttribute('style') || '';
+                    
+                    bottomLeftImg.replaceWith(inlineSvg);
+                    
+                    // Apply breathing animation to circles
+                    const circles = inlineSvg.querySelectorAll('circle');
+                    let totalCircles = 0;
+                    
+                    circles.forEach(circle => {
+                        const cx = circle.getAttribute('cx');
+                        const cy = circle.getAttribute('cy');
+                        const randomDuration = (Math.random() * 3 + 2).toFixed(2);
+                        const randomDelay = (Math.random() * 2).toFixed(2);
+                        
+                        circle.style.transformOrigin = `${cx}px ${cy}px`;
+                        circle.style.animationDuration = `${randomDuration}s`;
+                        circle.style.animationDelay = `${randomDelay}s`;
+                        circle.classList.add('breathing-circle');
+                        totalCircles++;
+                    });
+                    
+                    console.log(`✓ Section ${sectionIndex + 1} Bottom-left: Breathing applied to ${totalCircles} circles`);
+                })
+                .catch(err => console.error('Error loading SVG:', err));
+        }
+        
+        // Fetch and inline top-right SVG
+        if (topRightImg && topRightImg.tagName === 'IMG') {
+            const svgUrl = topRightImg.src;
+            fetch(svgUrl)
+                .then(response => response.text())
+                .then(svgContent => {
+                    const parser = new DOMParser();
+                    const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
+                    const inlineSvg = svgDoc.documentElement;
+                    
+                    inlineSvg.classList.add('hero-svg', 'hero-svg-top-right');
+                    inlineSvg.style.cssText = topRightImg.getAttribute('style') || '';
+                    
+                    topRightImg.replaceWith(inlineSvg);
+                    
+                    // Apply breathing animation to circles
+                    const circles = inlineSvg.querySelectorAll('circle');
+                    let totalCircles = 0;
+                    
+                    circles.forEach(circle => {
+                        const cx = circle.getAttribute('cx');
+                        const cy = circle.getAttribute('cy');
+                        const randomDuration = (Math.random() * 3 + 2).toFixed(2);
+                        const randomDelay = (Math.random() * 2).toFixed(2);
+                        
+                        circle.style.transformOrigin = `${cx}px ${cy}px`;
+                        circle.style.animationDuration = `${randomDuration}s`;
+                        circle.style.animationDelay = `${randomDelay}s`;
+                        circle.classList.add('breathing-circle');
+                        totalCircles++;
+                    });
+                    
+                    console.log(`✓ Section ${sectionIndex + 1} Top-right: Breathing applied to ${totalCircles} circles`);
+                })
+                .catch(err => console.error('Error loading SVG:', err));
+        }
     });
 }
 

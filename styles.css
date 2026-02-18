@@ -150,23 +150,21 @@ body {
     display: none;
 }
 
-@keyframes svgBreathing {
+@keyframes breathing {
     0%, 100% {
-        opacity: 0.7;
-        filter: drop-shadow(0 0 0px rgba(255,255,255,0));
+        transform: scale(1);
     }
     50% {
-        opacity: 1;
-        filter: drop-shadow(0 0 15px rgba(255,255,255,0.4));
+        transform: scale(1.2);
     }
 }
 
-.breathing-svg {
-    animation: svgBreathing 4s ease-in-out infinite;
-    will-change: opacity, filter;
+.breathing-circle {
+    animation: breathing 3s ease-in-out infinite;
+    will-change: transform;
 }
 
-.hero-section.paused .breathing-svg {
+.hero-section.paused .breathing-circle {
     animation-play-state: paused;
 }
 
