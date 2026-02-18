@@ -303,6 +303,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize language selector
     initLanguageSelector();
     
+    // Initialize hero title word animation
+    initHeroTitleAnimation();
+    
     // Initialize particle swell effect for hero-2
     initParticleSwell();
     
@@ -537,4 +540,37 @@ function initViewportObserver() {
     });
     
     console.log('✓ Viewport observer initialized for performance optimization');
+}
+
+// ============================================
+// HERO TITLE WORD ANIMATION
+// ============================================
+
+function initHeroTitleAnimation() {
+    const heroTitles = document.querySelectorAll('.hero-title');
+    
+    heroTitles.forEach(title => {
+        const text = title.textContent;
+        const words = text.split(' ');
+        
+        // Clear the original text
+        title.textContent = '';
+        
+        // Create a span for each word
+        words.forEach((word, index) => {
+            const wordSpan = document.createElement('span');
+            wordSpan.className = 'hero-title-word';
+            wordSpan.textContent = word;
+            wordSpan.style.animationDelay = `${index * 0.15}s`;
+            
+            title.appendChild(wordSpan);
+            
+            // Add space after each word except the last
+            if (index < words.length - 1) {
+                title.appendChild(document.createTextNode(' '));
+            }
+        });
+    });
+    
+    console.log('✓ Hero title word animation initialized');
 }
