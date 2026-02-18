@@ -306,7 +306,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize particle swell effect for hero-2
     initParticleSwell();
     
-    // Note: GSAP breathing animation is initialized separately via DOMContentLoaded
+    // Initialize SVG breathing effect
+    initSVGBreathing();
     
     // Initialize viewport observer for animations
     initViewportObserver();
@@ -419,85 +420,94 @@ function initParticleSwell() {
 }
 
 // ============================================
-// SVG BREATHING EFFECT WITH GSAP (INLINE SVGs)
+// SVG BREATHING EFFECT
 // ============================================
 
-function initGSAPBreathingFor(svgEl) {
-    if (!svgEl) return null;
+function initSVGBreathing() {
+    // Get all hero sections that should have breathing (hero-section without hero-2 or hero-no-breathing class)
+    const heroSections = document.querySelectorAll('.hero-section:not(.hero-2):not(.hero-no-breathing)');
     
-    const circles = svgEl.querySelectorAll('circle');
-    if (!circles.length) return null;
-    
-    // Add class for CSS transform setup
-    circles.forEach(c => c.classList.add('breath-circle'));
-    
-    // Create GSAP tweens for each circle
-    const tweens = [];
-    circles.forEach(c => {
-        const duration = gsap.utils.random(2, 5);
-        const delay = gsap.utils.random(0, 2);
-        const maxScale = gsap.utils.random(1.08, 1.25);
+    heroSections.forEach((section, sectionIndex) => {
+        const bottomLeftImg = section.querySelector('.hero-svg-bottom-left');
+        const topRightImg = section.querySelector('.hero-svg-top-right');
         
-        const t = gsap.to(c, {
-            scale: maxScale,
-            duration: duration,
-            ease: "sine.inOut",
-            yoyo: true,
-            repeat: -1,
-            delay: delay,
-            paused: true
-        });
+        // Apply breathing to bottom-left SVG
+        if (bottomLeftImg) {
+            fetch('assets/svg/bottom-left-new.svg')
+                .then(response => response.text())
+                .then(svgContent => {
+                    const svgWrapper = document.createElement('div');
+                    svgWrapper.innerHTML = svgContent;
+                    const inlineSvg = svgWrapper.querySelector('svg');
+                    
+                    inlineSvg.classList.add('hero-svg', 'hero-svg-bottom-left');
+                    inlineSvg.style.cssText = bottomLeftImg.getAttribute('style') || '';
+                    
+                    bottomLeftImg.replaceWith(inlineSvg);
+                    
+                    const allLayers = inlineSvg.querySelectorAll('[id^="Layer_"]');
+                    let totalCircles = 0;
+                    
+                    allLayers.forEach(layer => {
+                        const circles = layer.querySelectorAll('circle');
+                        circles.forEach(circle => {
+                            const cx = circle.getAttribute('cx');
+                            const cy = circle.getAttribute('cy');
+                            const randomDuration = (Math.random() * 3 + 2).toFixed(2);
+                            const randomDelay = (Math.random() * 2).toFixed(2);
+                            
+                            circle.style.transformOrigin = `${cx}px ${cy}px`;
+                            circle.style.animationDuration = `${randomDuration}s`;
+                            circle.style.animationDelay = `${randomDelay}s`;
+                            circle.classList.add('breathing-circle');
+                            totalCircles++;
+                        });
+                    });
+                    
+                    console.log(`✓ Section ${sectionIndex + 1} Bottom-left: Breathing applied to ${totalCircles} circles`);
+                })
+                .catch(err => console.error('Error loading bottom-left SVG:', err));
+        }
         
-        tweens.push(t);
-    });
-    
-    return {
-        play: () => tweens.forEach(tt => tt.play()),
-        pause: () => tweens.forEach(tt => tt.pause()),
-        kill: () => tweens.forEach(tt => tt.kill())
-    };
-}
-
-function setupAllSvgBreathing() {
-    // Check if GSAP is loaded
-    if (typeof gsap === 'undefined') {
-        console.warn('GSAP not loaded, skipping breathing animation');
-        return;
-    }
-    
-    // Find all inline hero SVGs
-    const targets = document.querySelectorAll('.hero-svg');
-    const controllers = new Map();
-    
-    // Setup IntersectionObserver to pause/play animations when offscreen
-    const io = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            const el = entry.target;
-            const ctrl = controllers.get(el);
-            if (!ctrl) return;
-            
-            if (entry.isIntersecting) {
-                ctrl.play();
-            } else {
-                ctrl.pause();
-            }
-        });
-    }, { threshold: 0.1 });
-    
-    // Initialize breathing for each SVG
-    targets.forEach(svg => {
-        const ctrl = initGSAPBreathingFor(svg);
-        if (ctrl) {
-            controllers.set(svg, ctrl);
-            io.observe(svg);
+        // Apply breathing to top-right SVG
+        if (topRightImg) {
+            fetch('assets/svg/top-right-new.svg')
+                .then(response => response.text())
+                .then(svgContent => {
+                    const svgWrapper = document.createElement('div');
+                    svgWrapper.innerHTML = svgContent;
+                    const inlineSvg = svgWrapper.querySelector('svg');
+                    
+                    inlineSvg.classList.add('hero-svg', 'hero-svg-top-right');
+                    inlineSvg.style.cssText = topRightImg.getAttribute('style') || '';
+                    
+                    topRightImg.replaceWith(inlineSvg);
+                    
+                    const allLayers = inlineSvg.querySelectorAll('[id^="Layer_"]');
+                    let totalCircles = 0;
+                    
+                    allLayers.forEach(layer => {
+                        const circles = layer.querySelectorAll('circle');
+                        circles.forEach(circle => {
+                            const cx = circle.getAttribute('cx');
+                            const cy = circle.getAttribute('cy');
+                            const randomDuration = (Math.random() * 3 + 2).toFixed(2);
+                            const randomDelay = (Math.random() * 2).toFixed(2);
+                            
+                            circle.style.transformOrigin = `${cx}px ${cy}px`;
+                            circle.style.animationDuration = `${randomDuration}s`;
+                            circle.style.animationDelay = `${randomDelay}s`;
+                            circle.classList.add('breathing-circle');
+                            totalCircles++;
+                        });
+                    });
+                    
+                    console.log(`✓ Section ${sectionIndex + 1} Top-right: Breathing applied to ${totalCircles} circles`);
+                })
+                .catch(err => console.error('Error loading top-right SVG:', err));
         }
     });
-    
-    console.log(`✓ GSAP breathing animation initialized for ${controllers.size} SVG(s)`);
 }
-
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', setupAllSvgBreathing);
 
 // ============================================
 // VIEWPORT OBSERVER FOR PERFORMANCE
