@@ -15,7 +15,10 @@
     
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body data-content-loaded="false">
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen"></div>
+
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="navbar-container">
@@ -91,5 +94,33 @@
     </section>
 
     <script src="script.js"></script>
-</body>
-</html>
+    <script>
+        // Remove loading screen once SVGs are loaded
+        function hideLoadingScreen() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    // Trigger animations after loading screen disappears
+                    document.body.setAttribute('data-content-loaded', 'true');
+                }, 300);
+            }
+        }
+
+        // Check if SVGs are loaded
+        const svgs = document.querySelectorAll('.hero-svg');
+        let loadedCount = 0;
+        
+        svgs.forEach(svg => {
+            svg.addEventListener('load', () => {
+                loadedCount++;
+                if (loadedCount === svgs.length) {
+                    hideLoadingScreen();
+                }
+            });
+        });
+
+        // Fallback: hide loading screen after 2 seconds
+        setTimeout(hideLoadingScreen, 2000);
+    </script>

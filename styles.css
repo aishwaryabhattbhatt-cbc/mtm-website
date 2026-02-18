@@ -85,6 +85,30 @@ body {
     background-color: var(--color-white);
 }
 
+/* ============================================
+   LOADING SCREEN
+   ============================================ */
+
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-white);
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.3s ease-out;
+}
+
+/* Pause animations while loading */
+body[data-content-loaded="false"] .hero-title-word,
+body[data-content-loaded="false"] .hero-subtitle,
+body[data-content-loaded="false"] .hero-buttons,
+body[data-content-loaded="false"] .hero-image-right {
+    animation-play-state: paused !important;
+}
+
 @keyframes fluidWave {
     0% {
         background-position: 0% 50%;
@@ -257,7 +281,7 @@ body {
     line-height: 1.1;
     color: var(--color-black);
     margin: 0;
-    letter-spacing: -10%;
+    letter-spacing: -0.04em;
 }
 
 .hero-title-word {
