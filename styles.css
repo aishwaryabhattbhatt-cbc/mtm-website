@@ -233,6 +233,8 @@ body {
     max-width: 700 px;
     object-fit: contain;
     margin-top: 200px;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out forwards;
 }
 
 @media (min-width: 1024px) {
@@ -255,6 +257,7 @@ body {
     line-height: 1.1;
     color: var(--color-black);
     margin: 0;
+    letter-spacing: -5%;
 }
 
 .hero-title-word {
@@ -282,12 +285,27 @@ body {
     line-height: 1.4;
     color: var(--color-black);
     margin: 0;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .hero-buttons {
     display: flex;
     gap: 16px;
     flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out forwards;
 }
 
 .hero-btn {

@@ -548,6 +548,8 @@ function initViewportObserver() {
 
 function initHeroTitleAnimation() {
     const heroTitles = document.querySelectorAll('.hero-title');
+    const wordDelay = 0.15; // Delay between each word (seconds)
+    const wordAnimationDuration = 0.6; // Duration of each word animation (seconds)
     
     heroTitles.forEach(title => {
         const text = title.textContent;
@@ -561,7 +563,7 @@ function initHeroTitleAnimation() {
             const wordSpan = document.createElement('span');
             wordSpan.className = 'hero-title-word';
             wordSpan.textContent = word;
-            wordSpan.style.animationDelay = `${index * 0.15}s`;
+            wordSpan.style.animationDelay = `${index * wordDelay}s`;
             
             title.appendChild(wordSpan);
             
@@ -570,7 +572,35 @@ function initHeroTitleAnimation() {
                 title.appendChild(document.createTextNode(' '));
             }
         });
+        
+        // Calculate total title animation duration
+        const totalTitleDuration = (words.length - 1) * wordDelay + wordAnimationDuration;
+        
+        // Get the hero-content container
+        const heroContent = title.closest('.hero-content');
+        if (heroContent) {
+            // Set animation delay for subtitle
+            const subtitle = heroContent.querySelector('.hero-subtitle');
+            if (subtitle) {
+                subtitle.style.animationDelay = `${totalTitleDuration + 0.1}s`;
+            }
+            
+            // Set animation delay for buttons
+            const buttons = heroContent.querySelector('.hero-buttons');
+            if (buttons) {
+                buttons.style.animationDelay = `${totalTitleDuration + 0.1}s`;
+            }
+        }
+        
+        // Get the hero-image-right for this section
+        const heroSection = title.closest('.hero-section');
+        if (heroSection) {
+            const heroImage = heroSection.querySelector('.hero-image-right');
+            if (heroImage) {
+                heroImage.style.animationDelay = `${totalTitleDuration + 0.6}s`;
+            }
+        }
     });
     
-    console.log('✓ Hero title word animation initialized');
+    console.log('✓ Hero title word animation initialized with sequential content reveal');
 }
