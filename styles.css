@@ -1300,6 +1300,9 @@ p {
     overflow: hidden;
     animation: none !important;
     background: transparent !important;
+    background-image: none !important;
+    background-color: transparent !important;
+    background-size: auto !important;
 }
 
 .unicorn-background {
@@ -1328,6 +1331,9 @@ p {
     overflow: hidden;
     animation: none !important;
     background: transparent !important;
+    background-image: none !important;
+    background-color: transparent !important;
+    background-size: auto !important;
 }
 
 .hero-6 .hero-container {
