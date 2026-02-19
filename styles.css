@@ -1367,6 +1367,17 @@ p {
     color: #ffffff;
 }
 
+/* Hero 8 - WebGL Background */
+.hero-8 {
+    position: relative;
+    overflow: hidden;
+    animation: none !important;
+    background: transparent !important;
+    background-image: none !important;
+    background-color: transparent !important;
+    background-size: auto !important;
+}
+
 .hero-6 .hero-container {
     position: relative;
     z-index: 1;
