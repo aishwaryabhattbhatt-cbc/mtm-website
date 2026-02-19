@@ -354,7 +354,7 @@ function initParticleSwell() {
                 position: absolute;
                 width: 4px;
                 height: 4px;
-                background: rgba(255, 255, 255, 0.8);
+                background: #ffffff;
                 border-radius: 50%;
                 left: ${i * particleSpacing}px;
                 top: ${j * particleSpacing}px;
@@ -397,15 +397,12 @@ function initParticleSwell() {
             const dy = mouseY - p.originY;
             const dist = Math.sqrt(dx * dx + dy * dy);
             
-            let opacity = 0.4;
+            let opacity = 1;
             let scale = 1;
             
             if (dist < mouseDist && dist > 0) {
                 const proximity = 1 - (dist / mouseDist);
                 const strength = proximity * proximity;
-                
-                // Map proximity to opacity: 0.4 to 1.0
-                opacity = 0.4 + (strength * 0.6);
                 
                 // Circle closest to cursor scales to 6x
                 // Surrounding circles scale to 2x+ based on proximity
