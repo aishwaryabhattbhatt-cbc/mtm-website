@@ -114,7 +114,7 @@
         let zoff = 0;
 
         function setup() {
-          const canvas = createCanvas(1920, 850, WEBGL);
+          const canvas = createCanvas(windowWidth, windowHeight, WEBGL);
           canvas.parent('p5-background');
           noStroke();
           pixelDensity(1);
@@ -122,6 +122,16 @@
           mouseX = -2000;
           mouseY = -2000;
 
+          initParticles();
+        }
+
+        function windowResized() {
+          resizeCanvas(windowWidth, windowHeight);
+          particles = [];
+          initParticles();
+        }
+
+        function initParticles() {
           let pCols = 100;
           let pRows = 50;
 
