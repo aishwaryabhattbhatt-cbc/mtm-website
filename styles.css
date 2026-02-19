@@ -95,10 +95,17 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: var(--color-white);
+    background-color: #000000;
     z-index: 9999;
     opacity: 1;
     transition: opacity 0.3s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 /* Pause animations while loading */
@@ -107,6 +114,14 @@ body[data-content-loaded="false"] .hero-subtitle,
 body[data-content-loaded="false"] .hero-buttons,
 body[data-content-loaded="false"] .hero-image-right {
     animation-play-state: paused !important;
+}
+
+/* Resume animations after loading */
+body[data-content-loaded="true"] .hero-title-word,
+body[data-content-loaded="true"] .hero-subtitle,
+body[data-content-loaded="true"] .hero-buttons,
+body[data-content-loaded="true"] .hero-image-right {
+    animation-play-state: running !important;
 }
 
 @keyframes fluidWave {
@@ -259,6 +274,70 @@ body[data-content-loaded="false"] .hero-image-right {
     margin-top: 200px;
     opacity: 0;
     animation: fadeInUp 0.8s ease-out forwards;
+}
+
+/* Collage Layout */
+.hero-image-collage {
+    position: relative;
+    width: 620px;
+    height: 530px;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out forwards;
+    overflow: visible;
+}
+
+.collage-image {
+    position: absolute;
+    object-fit: cover;
+    opacity: 0;
+    animation: fadeInUp forwards;
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+    border-radius: 8px;
+}
+
+.collage-image:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.collage-image-1 {
+    width: 141px;
+    height: 122px;
+    left: 153px;
+    top: 100px;
+    z-index: 5;
+}
+
+.collage-image-2 {
+    width: 314px;
+    height: 348px;
+    left: 306px;
+    top: 100px;
+    z-index: 5;
+}
+
+.collage-image-3 {
+    width: 211px;
+    height: 31px;
+    left: 409px;
+    top: 460px;
+    z-index: 5;
+}
+
+.collage-image-4 {
+    width: 158px;
+    height: 170px;
+    left: 239px;
+    top: 455px;
+    z-index: 10;
+}
+
+.collage-image-5 {
+    width: 287px;
+    height: 346px;
+    left: 7px;
+    top: 234px;
+    z-index: 1;
 }
 
 @media (min-width: 1024px) {
@@ -475,6 +554,32 @@ body[data-content-loaded="false"] .hero-image-right {
     gap: 8px;
     height: 42px;
     border-radius: 8px;
+    position: relative;
+}
+
+.nav-link[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    transform: translate(-50%, 8px);
+    background: rgba(20, 20, 20, 0.95);
+    color: #ffffff;
+    font-size: 12px;
+    line-height: 1.2;
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 20;
+}
+
+.nav-link[data-tooltip]:hover::after {
+    opacity: 1;
+    transform: translate(-50%, 12px);
 }
 
 .nav-link:hover {

@@ -547,9 +547,31 @@ function initViewportObserver() {
 // ============================================
 
 function initHeroTitleAnimation() {
+    // Only run on pages that have loading screens (hero1, hero3)
+    const hasLoadingScreen = document.getElementById('loadingScreen');
+    
+    // If there's a loading screen, wait for content to be loaded
+    if (hasLoadingScreen && document.body.getAttribute('data-content-loaded') !== 'true') {
+        // Wait for content to load
+        const checkInterval = setInterval(() => {
+            if (document.body.getAttribute('data-content-loaded') === 'true') {
+                clearInterval(checkInterval);
+                runTitleAnimation();
+            }
+        }, 50);
+        return;
+    }
+    
+    // Run animation immediately if no loading screen
+    runTitleAnimation();
+}
+
+function runTitleAnimation() {
     const heroTitles = document.querySelectorAll('.hero-title');
     const wordDelay = 0.15; // Delay between each word (seconds)
     const wordAnimationDuration = 0.6; // Duration of each word animation (seconds)
+    const collageImageAnimationDuration = 0.5; // Slightly faster animation for collage images
+    const collageImageGap = 0.09; // Slightly shorter gap between each collage image appearance
     
     heroTitles.forEach(title => {
         const text = title.textContent;
@@ -592,15 +614,37 @@ function initHeroTitleAnimation() {
             }
         }
         
-        // Get the hero-image-right for this section
+        // Get the hero-section for collage images
         const heroSection = title.closest('.hero-section');
         if (heroSection) {
             const heroImage = heroSection.querySelector('.hero-image-right');
             if (heroImage) {
                 heroImage.style.animationDelay = `${totalTitleDuration + 0.6}s`;
             }
+            
+            // Set animation delays for collage images
+            const collageImages = heroSection.querySelectorAll('.collage-image');
+            if (collageImages.length > 0) {
+                // Buttons finish at: totalTitleDuration + 0.1 + 0.8 (button animation duration)
+                const buttonsFinishTime = totalTitleDuration + 0.1 + 0.8;
+                
+                collageImages.forEach((img, index) => {
+                    // Image delay: when buttons finish + small buffer + sequential delay for each image
+                    const delay = buttonsFinishTime + 0.1 + (index * (collageImageAnimationDuration + collageImageGap));
+                    img.style.animationDelay = `${delay}s`;
+                    img.style.animationDuration = `${collageImageAnimationDuration}s`;
+                });
+            }
         }
     });
     
-    console.log('✓ Hero title word animation initialized with sequential content reveal');
+    // Force animation restart by removing and re-adding animation-play-state
+    // This ensures animations start from the beginning
+    setTimeout(() => {
+        document.querySelectorAll('.hero-title-word, .hero-subtitle, .hero-buttons, .hero-image-right, .collage-image').forEach(el => {
+            el.style.animationPlayState = 'running';
+        });
+    }, 10);
+    
+    console.log('✓ Hero title word animation initialized with sequential content reveal and collage images');
 }
