@@ -49,6 +49,9 @@
                     <li class="nav-item">
                         <a href="hero4.html" class="nav-link" data-tooltip="static gradient + dots swell on hover">HERO 4</a>
                     </li>
+                    <li class="nav-item">
+                        <a href="hero5.html" class="nav-link" data-tooltip="webgl 3d scene background">HERO 5</a>
+                    </li>
                 </ul>
 
                 <!-- Action Buttons -->
@@ -100,49 +103,15 @@
     </section>
 
     <script>
-        // Setup loading screen logic BEFORE script.js runs
+        // Give page a moment to render before starting animations
         (function() {
             const loadingScreen = document.getElementById('loadingScreen');
-            const minLoadingTime = 1500; // Minimum time to show loading screen (ms)
-            let startTime = Date.now();
-            let svgsReady = false;
-
-            function hideLoadingScreen() {
-                // Ensure minimum loading time has passed
-                const elapsed = Date.now() - startTime;
-                const delay = Math.max(0, minLoadingTime - elapsed);
-                
-                setTimeout(() => {
-                    if (loadingScreen) {
-                        loadingScreen.style.opacity = '0';
-                        setTimeout(() => {
-                            loadingScreen.style.display = 'none';
-                            document.body.setAttribute('data-content-loaded', 'true');
-                        }, 300);
-                    }
-                }, delay);
-            }
-
-            // Setup SVG load listeners
-            const svgs = document.querySelectorAll('.hero-svg');
-            let loadedCount = 0;
-            
-            svgs.forEach(svg => {
-                // Add load listener regardless of cache status
-                svg.addEventListener('load', () => {
-                    loadedCount++;
-                    if (loadedCount === svgs.length) {
-                        svgsReady = true;
-                        hideLoadingScreen();
-                    }
-                });
-            });
-
-            // Fallback: always hide after max time
             setTimeout(() => {
-                svgsReady = true;
-                hideLoadingScreen();
-            }, 4000);
+                if (loadingScreen) {
+                    loadingScreen.style.display = 'none';
+                }
+                document.body.setAttribute('data-content-loaded', 'true');
+            }, 200);
         })();
     </script>
     <script src="script.js"></script>

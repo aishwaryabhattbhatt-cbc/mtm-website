@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hero 3 - MTM Website</title>
+    <title>Hero 5 - MTM Website</title>
     
     <!-- Google Fonts: Roboto -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,10 +15,7 @@
     
     <link rel="stylesheet" href="styles.css">
 </head>
-<body data-content-loaded="false">
-    <!-- Loading Screen -->
-    <div class="loading-screen" id="loadingScreen">Loading...</div>
-
+<body>
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="navbar-container">
@@ -79,8 +76,11 @@
         </div>
     </nav>
 
-    <!-- Hero Section 3 - Static gradient with breathing SVGs -->
-    <section class="hero-section hero-static">
+    <!-- Hero Section 5 with WebGL Background -->
+    <section class="hero-section hero-5">
+        <!-- Unicorn Studio WebGL Background -->
+        <div class="unicorn-background" data-us-project="7VD3MpUPQdfQhII3qQ4i"></div>
+        
         <div class="hero-container">
             <div class="hero-content">
                 <h1 class="hero-title">The Standard for Media & Tech Insights</h1>
@@ -98,20 +98,16 @@
                 <img src="assets/svg/5.svg" alt="Collage Image 5" class="collage-image collage-image-5">
             </div>
         </div>
-        <img src="assets/svg/top-right-new.svg" alt="Decorative SVG" class="hero-svg hero-svg-top-right">
-        <img src="assets/svg/bottom-left-new.svg" alt="Decorative SVG" class="hero-svg hero-svg-bottom-left">
     </section>
 
+    <!-- Unicorn Studio SDK -->
+    <script src="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.0.5/dist/unicornStudio.umd.js"></script>
     <script>
-        // Give page a moment to render before starting animations
-        (function() {
-            const loadingScreen = document.getElementById('loadingScreen');
-            setTimeout(() => {
-                if (loadingScreen) {
-                    loadingScreen.style.display = 'none';
-                }
-                document.body.setAttribute('data-content-loaded', 'true');
-            }, 200);
-        })();
+        // Initialize Unicorn Studio scene
+        if (typeof UnicornStudio !== 'undefined') {
+            UnicornStudio.init();
+        }
     </script>
     <script src="script.js"></script>
+</body>
+</html>

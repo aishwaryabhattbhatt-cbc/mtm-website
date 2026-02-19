@@ -547,23 +547,10 @@ function initViewportObserver() {
 // ============================================
 
 function initHeroTitleAnimation() {
-    // Only run on pages that have loading screens (hero1, hero3)
-    const hasLoadingScreen = document.getElementById('loadingScreen');
-    
-    // If there's a loading screen, wait for content to be loaded
-    if (hasLoadingScreen && document.body.getAttribute('data-content-loaded') !== 'true') {
-        // Wait for content to load
-        const checkInterval = setInterval(() => {
-            if (document.body.getAttribute('data-content-loaded') === 'true') {
-                clearInterval(checkInterval);
-                runTitleAnimation();
-            }
-        }, 50);
-        return;
-    }
-    
-    // Run animation immediately if no loading screen
-    runTitleAnimation();
+    // Wait a brief moment for page to fully render before starting animations
+    setTimeout(() => {
+        runTitleAnimation();
+    }, 100);
 }
 
 function runTitleAnimation() {
