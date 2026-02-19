@@ -1378,6 +1378,15 @@ p {
     background-size: auto !important;
 }
 
+/* Hero 9 - Blank Background */
+.hero-9 {
+    position: relative;
+    overflow: hidden;
+    animation: none !important;
+    background: #ffffff !important;
+    background-image: none !important;
+}
+
 .hero-6 .hero-container {
     position: relative;
     z-index: 1;
