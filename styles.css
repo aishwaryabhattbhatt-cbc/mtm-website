@@ -1364,7 +1364,7 @@ p {
 
 .hero-7 .hero-title,
 .hero-7 .hero-subtitle {
-    color: #ffffff;
+    color: #ffffff !important;
 }
 
 /* Hero 8 - WebGL Background */
