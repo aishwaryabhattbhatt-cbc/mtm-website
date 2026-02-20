@@ -1,257 +1,169 @@
 import * as THREE from 'three';
-import GUI from 'lil-gui';
-import { vertexShader } from './shaders/vertex.glsl.js';
-import { fragmentShader } from './shaders/fragment.glsl.js';
+import SimplexNoise from './simplexNoise.js';
+import vertexShader from './shaders/vertex.glsl?raw';
+import fragmentShader from './shaders/fragment.glsl?raw';
 
-// Scene setup
-const canvas = document.querySelector('canvas') || createCanvas();
-const scene = new THREE.Scene();
-const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
-camera.position.z = 1;
+class NoiseWarpEffect {
+  constructor() {
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    
+    this.container = document.getElementById('canvas-container');
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.setClearColor(0x0a0a0a);
+    this.container.appendChild(this.renderer.domElement);
 
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0x1a1a1a);
+    // Uniforms
+    this.uniforms = {
+      uTexture: { value: this.createDefaultTexture() },
+      uTime: { value: 0 },
+      uIntensity: { value: 0.5 },
+      uScale: { value: 1 },
+      uSpeed: { value: 0.5 },
+      uTurbulence: { value: 1 }
+    };
 
-// Create plane geometry and material
-const geometry = new THREE.PlaneGeometry(2, 2);
-let texture = null;
-let material = null;
-const clock = new THREE.Clock();
+    // Create geometry and material
+    const geometry = new THREE.PlaneGeometry(2, 2);
+    const material = new THREE.ShaderMaterial({
+      uniforms: this.uniforms,
+      vertexShader,
+      fragmentShader
+    });
 
-// GUI parameters
-const params = {
-    intensity: 0.05,
-    noiseScale: 2.5,
-    speed: 0.8,
-    octaves: 4,
-    chromaticAberration: 0,
-    aspectMode: 'cover', // 'cover' or 'contain'
-    edgeClamp: true,
-    playing: true
-};
+    const mesh = new THREE.Mesh(geometry, material);
+    this.scene.add(mesh);
 
-function createCanvas() {
+    // Event listeners
+    window.addEventListener('resize', () => this.onWindowResize());
+    
+    // Control listeners
+    document.getElementById('intensitySlider').addEventListener('input', (e) => {
+      this.uniforms.uIntensity.value = parseFloat(e.target.value);
+      document.getElementById('intensityValue').textContent = parseFloat(e.target.value).toFixed(2);
+    });
+
+    document.getElementById('scaleSlider').addEventListener('input', (e) => {
+      this.uniforms.uScale.value = parseFloat(e.target.value);
+      document.getElementById('scaleValue').textContent = parseFloat(e.target.value).toFixed(2);
+    });
+
+    document.getElementById('speedSlider').addEventListener('input', (e) => {
+      this.uniforms.uSpeed.value = parseFloat(e.target.value);
+      document.getElementById('speedValue').textContent = parseFloat(e.target.value).toFixed(2);
+    });
+
+    document.getElementById('turbulenceSlider').addEventListener('input', (e) => {
+      this.uniforms.uTurbulence.value = parseInt(e.target.value);
+      document.getElementById('turbulenceValue').textContent = e.target.value;
+    });
+
+    document.getElementById('imageInput').addEventListener('change', (e) => {
+      this.loadImage(e.target.files[0]);
+    });
+
+    this.animate();
+    this.setupFPS();
+  }
+
+  createDefaultTexture() {
     const canvas = document.createElement('canvas');
-    document.getElementById('container').appendChild(canvas);
-    return canvas;
-}
+    canvas.width = 256;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
 
-async function loadTexture(source) {
-    const loader = new THREE.TextureLoader();
-    try {
-        const tex = await loader.loadAsync(source);
-        tex.minFilter = THREE.LinearFilter;
-        tex.magFilter = THREE.LinearFilter;
-        return tex;
-    } catch (error) {
-        console.error('Failed to load image:', error);
-        return null;
-    }
-}
+    // Create a gradient pattern
+    const gradient = ctx.createLinearGradient(0, 0, 256, 256);
+    gradient.addColorStop(0, '#1a1a2e');
+    gradient.addColorStop(0.5, '#16213e');
+    gradient.addColorStop(1, '#0f3460');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 256, 256);
 
-function updateMaterial() {
-    if (texture) {
-        material = new THREE.ShaderMaterial({
-            vertexShader,
-            fragmentShader,
-            uniforms: {
-                uTex: { value: texture },
-                uTime: { value: 0 },
-                uIntensity: { value: params.intensity },
-                uNoiseScale: { value: params.noiseScale },
-                uSpeed: { value: params.speed },
-                uOctaves: { value: params.octaves },
-                uChromaticAberration: { value: params.chromaticAberration },
-                uEdgeClamp: { value: params.edgeClamp ? 1.0 : 0.0 },
-                uTexScale: { value: new THREE.Vector2(1, 1) },
-                uTexOffset: { value: new THREE.Vector2(0, 0) }
-            }
-        });
+    // Add some noise-like pattern
+    const imageData = ctx.getImageData(0, 0, 256, 256);
+    const data = imageData.data;
+    const simplex = new SimplexNoise(Math.random);
 
-        if (scene.children.length > 0) {
-            scene.remove(scene.children[0]);
-        }
+    for (let i = 0; i < data.length; i += 4) {
+      const index = i / 4;
+      const x = (index % 256) / 256;
+      const y = Math.floor(index / 256) / 256;
+      const noise = (simplex.noise(x * 4, y * 4) + 1) / 2;
+      const value = Math.floor(noise * 255);
 
-        const mesh = new THREE.Mesh(geometry, material);
-        scene.add(mesh);
-        updateAspectRatio();
-    }
-}
-
-function updateAspectRatio() {
-    if (!texture || !material) return;
-
-    const canvas = renderer.domElement;
-    const aspectCanvas = canvas.clientWidth / canvas.clientHeight;
-    const aspectTexture = texture.image.width / texture.image.height;
-
-    let scale, offset;
-
-    if (params.aspectMode === 'cover') {
-        // Image covers canvas, may crop
-        if (aspectTexture > aspectCanvas) {
-            scale = new THREE.Vector2(aspectTexture / aspectCanvas, 1);
-            offset = new THREE.Vector2((scale.x - 1) * 0.5, 0);
-        } else {
-            scale = new THREE.Vector2(1, aspectCanvas / aspectTexture);
-            offset = new THREE.Vector2(0, (scale.y - 1) * 0.5);
-        }
-    } else {
-        // Image contained in canvas, may have letterboxing
-        if (aspectTexture > aspectCanvas) {
-            scale = new THREE.Vector2(1, aspectCanvas / aspectTexture);
-            offset = new THREE.Vector2(0, (1 - scale.y) * 0.5);
-        } else {
-            scale = new THREE.Vector2(aspectTexture / aspectCanvas, 1);
-            offset = new THREE.Vector2((1 - scale.x) * 0.5, 0);
-        }
+      data[i] = Math.min(255, data[i] + value * 0.3);
+      data[i + 1] = Math.min(255, data[i + 1] + value * 0.2);
+      data[i + 2] = Math.min(255, data[i + 2] + value * 0.4);
     }
 
-    material.uniforms.uTexScale.value = scale;
-    material.uniforms.uTexOffset.value = offset;
-}
+    ctx.putImageData(imageData, 0, 0);
 
-async function initializeWithDefaultImage() {
-    texture = await loadTexture('/sample.jpg');
-    if (!texture) {
-        // Create a fallback gradient texture
-        const canvas = document.createElement('canvas');
-        canvas.width = 256;
-        canvas.height = 256;
-        const ctx = canvas.getContext('2d');
-        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-        gradient.addColorStop(0, '#ff006e');
-        gradient.addColorStop(0.5, '#6c5ce7');
-        gradient.addColorStop(1, '#00b4db');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        texture = new THREE.CanvasTexture(canvas);
-    }
-    updateMaterial();
-}
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    return texture;
+  }
 
-// GUI setup
-const gui = new GUI({ container: document.body });
-gui.title('Noise Distortion Controls');
+  loadImage(file) {
+    if (!file) return;
 
-gui.add(params, 'intensity', 0, 0.2, 0.01).name('Intensity').onChange(() => {
-    if (material) material.uniforms.uIntensity.value = params.intensity;
-});
-
-gui.add(params, 'noiseScale', 0.5, 10, 0.1).name('Noise Scale').onChange(() => {
-    if (material) material.uniforms.uNoiseScale.value = params.noiseScale;
-});
-
-gui.add(params, 'speed', 0, 2, 0.05).name('Speed').onChange(() => {
-    if (material) material.uniforms.uSpeed.value = params.speed;
-});
-
-gui.add(params, 'octaves', 1, 5, 1).name('Octaves').onChange(() => {
-    if (material) material.uniforms.uOctaves.value = params.octaves;
-});
-
-gui.add(params, 'chromaticAberration', 0, 0.02, 0.001).name('Chromatic Aberration').onChange(() => {
-    if (material) material.uniforms.uChromaticAberration.value = params.chromaticAberration;
-});
-
-gui.add(params, 'edgeClamp').name('Edge Clamp').onChange(() => {
-    if (material) material.uniforms.uEdgeClamp.value = params.edgeClamp ? 1.0 : 0.0;
-});
-
-gui.add(params, 'aspectMode', ['cover', 'contain']).name('Aspect Mode').onChange(updateAspectRatio);
-
-gui.add(params, 'playing').name('Playing');
-
-// Image loading
-async function loadImageFromFile(file) {
     const reader = new FileReader();
-    reader.onload = async (e) => {
-        const img = new Image();
-        img.onload = () => {
-            texture = new THREE.CanvasTexture(
-                (function () {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-                    return canvas;
-                })()
-            );
-            texture.minFilter = THREE.LinearFilter;
-            texture.magFilter = THREE.LinearFilter;
-            updateMaterial();
-        };
-        img.src = e.target.result;
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        this.uniforms.uTexture.value = texture;
+      };
+      img.src = event.target.result;
     };
     reader.readAsDataURL(file);
+  }
+
+  onWindowResize() {
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+  }
+
+  animate = () => {
+    requestAnimationFrame(this.animate);
+
+    this.uniforms.uTime.value += 0.016; // ~60fps
+    this.renderer.render(this.scene, this.camera);
+  };
+
+  setupFPS() {
+    let frameCount = 0;
+    let lastTime = performance.now();
+
+    setInterval(() => {
+      const currentTime = performance.now();
+      const elapsed = currentTime - lastTime;
+      const fps = Math.round((frameCount * 1000) / elapsed);
+      document.getElementById('fpsCounter').textContent = `FPS: ${fps}`;
+      frameCount = 0;
+      lastTime = currentTime;
+    }, 1000);
+
+    const originalAnimate = this.animate;
+    this.animate = () => {
+      frameCount++;
+      originalAnimate.call(this);
+    };
+  }
 }
 
-document.getElementById('imageInput').addEventListener('change', (e) => {
-    if (e.target.files.length > 0) {
-        loadImageFromFile(e.target.files[0]);
-    }
-});
-
-// Drag and drop
-const dropZone = document.getElementById('dropZone');
-['dragenter', 'dragover', 'dragleave', 'drop'].forEach((eventName) => {
-    dropZone.addEventListener(eventName, preventDefaults, false);
-});
-
-function preventDefaults(e) {
-    e.preventDefault();
-    e.stopPropagation();
-}
-
-['dragenter', 'dragover'].forEach((eventName) => {
-    dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
-});
-
-['dragleave', 'drop'].forEach((eventName) => {
-    dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
-});
-
-dropZone.addEventListener('drop', (e) => {
-    const dt = e.dataTransfer;
-    const files = dt.files;
-    if (files.length > 0) {
-        const file = files[0];
-        if (file.type.startsWith('image/')) {
-            loadImageFromFile(file);
-        }
-    }
-}, false);
-
-// Window resize
-window.addEventListener('resize', () => {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    updateAspectRatio();
-});
-
-// Animation loop
-function animate() {
-    requestAnimationFrame(animate);
-
-    if (params.playing && material) {
-        material.uniforms.uTime.value = clock.getElapsedTime();
-    }
-
-    renderer.render(scene, camera);
-}
-
-// Start
-initializeWithDefaultImage().then(() => {
-    animate();
-});
-
-// Cleanup
-window.addEventListener('beforeunload', () => {
-    geometry.dispose();
-    if (material) material.dispose();
-    if (texture) texture.dispose();
-    renderer.dispose();
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  new NoiseWarpEffect();
 });

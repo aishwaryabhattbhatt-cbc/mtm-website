@@ -1,6 +1,5 @@
 {
-  "name": "noise-warp-effect",
-  "private": true,
+  "name": "hero9-noise-warp",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -8,11 +7,11 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-  "devDependencies": {
-    "vite": "^5.0.0"
-  },
   "dependencies": {
-    "three": "^r128",
-    "lil-gui": "^0.19.1"
+    "three": "^r128"
+  },
+  "devDependencies": {
+    "vite": "^4.4.0",
+    "@types/node": "^20.0.0"
   }
 }

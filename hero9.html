@@ -73,10 +73,17 @@
         </div>
     </nav>
 
-    <!-- Hero Section 9 with Blank Background -->
+    <!-- Hero Section 9 with WebGL Noise Warp Background -->
     <section class="hero-section hero-9">
+        <!-- WebGL Noise Warp Canvas -->
+        <div id="webgl-background" class="webgl-background"></div>
+        
+        <!-- Grain Overlay -->
+        <div class="grain-overlay"></div>
+        
         <div class="hero-container">
             <div class="hero-content">
+                <div class="hero-text-blob" aria-hidden="true"></div>
                 <h1 class="hero-title">The Standard for Media & Tech Insights</h1>
                 <p class="hero-subtitle">Real data on how Canadians consume tech, content, and media. Built for leaders who don't guess.</p>
                 <div class="hero-buttons">
@@ -95,5 +102,6 @@
     </section>
 
     <script src="script.js"></script>
+    <script type="module" src="hero9-warp.js"></script>
 </body>
 </html>

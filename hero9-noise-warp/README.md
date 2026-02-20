@@ -1,156 +1,149 @@
-# WebGL Noise Distortion Effect
+# Hero 9 - WebGL Noise Warp Effect
 
-A high-performance WebGL-based noise distortion effect that warps images with organic, animated liquid/heat-haze distortions using Simplex noise and Fractional Brownian Motion (FBM).
+A high-performance WebGL noise distortion effect that warps input images with organic, liquid-like undulation using simplex noise. Built with Vite + Three.js and designed to run at 60 FPS on typical laptops.
 
 ## Features
 
-- **Organic Distortion**: Uses 2D Simplex noise + FBM for smooth, natural-looking warping
-- **Full-Screen Rendering**: Optimized with OrthographicCamera and fullscreen quad
-- **Real-Time GUI Controls**:
-  - **Intensity**: Warp strength (0–0.2)
-  - **Noise Scale**: Pattern size (0.5–10)
-  - **Speed**: Animation speed (0–2)
-  - **Octaves**: Turbulence layers (1–5)
-  - **Chromatic Aberration**: RGB channel separation (0–0.02, optional)
-  - **Edge Clamp**: Toggle between clamp and wrap modes
-  - **Aspect Mode**: Cover or contain image scaling
-  - **Playing**: Play/pause animation
-- **Image Loading**: 
-  - File input button
-  - Drag & drop support
-- **Performance Optimized**:
-  - Pixel ratio capped at 2x
-  - Efficient FBM implementation
-  - Lightweight shader overhead
-- **Responsive**: Handles canvas resize dynamically with correct aspect ratio
+- **WebGL Rendering**: Custom shader material with vertex and fragment shaders
+- **Organic Noise Distortion**: Simplex noise-based 2D warping for smooth, natural movement
+- **Real-time Controls**:
+  - Distortion Intensity: Control the strength of the warp effect (0-2)
+  - Noise Scale: Adjust the frequency/size of noise patterns (0.5-10)
+  - Animation Speed: Control how fast the noise animates (0-2)
+  - Turbulence Octaves: Multi-octave FBM for complex distortions (1-4)
+- **Image Swapping**: Load custom images to apply the warp effect
+- **Responsive Design**: Automatically handles window resizing
+- **FPS Counter**: Real-time performance monitoring
+- **60 FPS Target**: Optimized shader implementation for smooth performance
 
 ## Tech Stack
 
 - **Vite**: Fast build tool and dev server
-- **Three.js**: WebGL abstraction layer
-- **lil-gui**: Lightweight GUI library
-- **Simplex Noise**: 2D noise generation in GLSL
-
-## Quick Start
-
-### Prerequisites
-- Node.js 16+ and npm
-
-### Installation & Running
-
-```bash
-cd hero9-noise-warp
-npm install
-npm run dev
-```
-
-The development server will open at `http://localhost:5174`.
-
-### Building for Production
-
-```bash
-npm run build
-```
-
-Output will be in the `dist/` folder.
-
-## Usage
-
-1. **Adjust Parameters**: Use the GUI panel (top-right) to tweak effects
-2. **Load Image**: Click "📁 Load Image" button or drag & drop an image onto the canvas
-3. **Play/Pause**: Toggle animation with the "Playing" checkbox
+- **Three.js**: WebGL rendering library
+- **Custom GLSL Shaders**: Vertex and fragment shaders for distortion
+- **Simplex Noise**: 2D perlin-like noise implementation in JavaScript
 
 ## Project Structure
 
 ```
 hero9-noise-warp/
-├── index.html                 # Entry point
-├── vite.config.js            # Vite configuration
-├── package.json              # Dependencies
 ├── public/
-│   └── sample.jpg           # (optional) Sample image
-└── src/
-    ├── main.js              # Three.js scene, GUI setup, input handling
-    └── shaders/
-        ├── vertex.glsl.js   # Vertex shader (passes UV)
-        └── fragment.glsl.js # Fragment shader (noise + distortion)
+│   └── index.html          # Main HTML entry point
+├── src/
+│   ├── main.js             # Three.js scene setup and controls
+│   ├── simplexNoise.js     # Simplex noise implementation
+│   └── shaders/
+│       ├── vertex.glsl     # Vertex shader
+│       └── fragment.glsl   # Fragment shader with distortion logic
+├── package.json
+└── vite.config.js
 ```
 
-## Shader Implementation
+## Installation & Running
 
-### Fragment Shader Highlights
+1. **Install dependencies**:
+   ```bash
+   cd hero9-noise-warp
+   npm install
+   ```
 
-- **Simplex Noise**: High-quality 2D noise (Ashima Arts implementation)
-- **FBM (Fractional Brownian Motion)**: Multi-octave noise for richer detail
-- **Dynamic Offset Calculation**: 
-  - Primary distortion: `fbm(p + time_vec)`
-  - Secondary ripples: Sine/cosine waves for extra "liveliness"
-- **Aspect Ratio Correction**: `uTexScale` and `uTexOffset` prevent image stretching
-- **Edge Handling**: Clamp mode prevents sampling artifacts at edges
+2. **Start development server**:
+   ```bash
+   npm run dev
+   ```
+   Opens at `http://localhost:5173`
 
-### Uniform Parameters
+3. **Build for production**:
+   ```bash
+   npm run build
+   ```
 
-| Uniform | Type | Range | Purpose |
-|---------|------|-------|---------|
-| `uTex` | sampler2D | — | Input texture |
-| `uTime` | float | — | Elapsed time (animation driver) |
-| `uIntensity` | float | 0–0.2 | Warp strength |
-| `uNoiseScale` | float | 0.5–10 | Noise pattern size |
-| `uSpeed` | float | 0–2 | Animation speed multiplier |
-| `uOctaves` | float | 1–5 | FBM layers |
-| `uChromaticAberration` | float | 0–0.02 | RGB channel offset |
-| `uEdgeClamp` | float | 0/1 | Clamp vs wrap mode |
-| `uTexScale` | vec2 | — | Aspect ratio scale |
-| `uTexOffset` | vec2 | — | Aspect ratio offset |
+## How It Works
 
-## Performance Notes
+### Fragment Shader Distortion
+The fragment shader implements the core noise warping effect:
 
-- **Target**: 60 FPS on typical laptops
-- **Pixel Ratio**: Capped at 2x for performance
-- **Noise Complexity**: FBM with up to 5 octaves (adjustable)
-- **No Post-Processing Overhead**: Single-pass fragment shader
+1. **Noise Calculation**: Uses Fractional Brownian Motion (FBM) with multiple octaves for complex, natural-looking patterns
+2. **UV Distortion**: Generates X and Y noise offsets at normalized UV coordinates
+3. **Texture Sampling**: Samples the input texture at the distorted UV coordinates instead of original coordinates
+4. **Optional Brightness Variation**: Adds subtle brightness modulation based on noise patterns
 
-## Customization
+### Default Texture
+- Auto-generated gradient texture with noise pattern
+- Falls back when no image is loaded
+- Uses blue color palette for visual appeal
 
-### Adjust Default Parameters
+### Performance Optimization
+- OrthographicCamera for fullscreen quad rendering (simpler than perspective)
+- Efficient shader implementation with minimal calculations per fragment
+- FBM loop limited to 4 iterations max
+- Clamp distortion UV to prevent wrapping artifacts
 
-Edit `params` in `src/main.js`:
+## Controls Explained
 
-```javascript
-const params = {
-    intensity: 0.05,        // Increase for more warp
-    noiseScale: 2.5,        // Larger = bigger patterns
-    speed: 0.8,             // Faster animation
-    octaves: 4,             // More = richer detail (slower)
-    chromaticAberration: 0, // RGB separation effect
-    edgeClamp: true,        // Clamp edges (avoid repeating)
-    aspectMode: 'cover'     // 'cover' or 'contain'
-};
-```
+| Control | Range | Effect |
+|---------|-------|--------|
+| **Distortion Intensity** | 0-2 | How much the texture warps (0 = no effect, 2 = maximum warp) |
+| **Noise Scale** | 0.5-10 | Size of noise features (smaller = tighter, larger = broader waves) |
+| **Animation Speed** | 0-2 | How fast the distortion animates (0 = static, 2 = very fast) |
+| **Turbulence Octaves** | 1-4 | Number of noise layers (1 = simple, 4 = complex/detailed) |
 
-### Change Default Image
+## Loading Custom Images
 
-Replace the placeholder in `initializeWithDefaultImage()`:
+1. Click "Choose Image" button
+2. Select an image file from your computer
+3. The effect will apply to the uploaded image
+4. Adjust controls in real-time to customize the effect
 
-```javascript
-texture = await loadTexture('./path/to/your/image.jpg');
-```
+## Tips for Best Results
 
-Or place an image in `public/sample.jpg`.
+- **Subtle Effect**: Use low intensity (0.2-0.5) and low-medium scale (1-2) for professional look
+- **Dramatic Effect**: High intensity (1-2) with high scale (5-10) for bold visual impact
+- **Smooth Animation**: Use speed 0.3-0.7 for comfortable viewing
+- **Complex Details**: Increase turbulence octaves to 3-4 for intricate patterns
+- **Large Textures**: For smooth animations, ensure your input image is appropriately sized
 
 ## Browser Compatibility
 
-- Requires WebGL 1.0 support
-- Tested on:
-  - Chrome/Edge 90+
-  - Firefox 88+
-  - Safari 14+
-  - Mobile browsers (iOS Safari 14+, Chrome Android)
+- Chrome/Edge: Full support
+- Firefox: Full support
+- Safari: Full support (WebGL 2)
+- Mobile: Generally works but performance varies (test on target device)
+
+## Advanced Shader Parameters (Fragment Shader)
+
+The fragment shader uses these uniforms:
+- `uTexture`: Input texture to distort
+- `uTime`: Elapsed time for animation
+- `uIntensity`: Distortion magnitude multiplier
+- `uScale`: Noise frequency multiplier
+- `uSpeed`: Animation speed multiplier
+- `uTurbulence`: Number of FBM octaves
+
+Modify `fragment.glsl` to:
+- Change distortion formula
+- Adjust noise sampling
+- Add color effects
+- Implement additional effects
+
+## Troubleshooting
+
+**Black screen?**
+- Check browser console for shader compilation errors
+- Ensure WebGL is enabled
+- Try a different browser
+
+**Low FPS?**
+- Reduce turbulence octaves
+- Lower distortion intensity
+- Use a smaller canvas size
+- Close other GPU-intensive applications
+
+**Texture not loading?**
+- Ensure file is a valid image format (PNG, JPG, etc.)
+- Check browser console for CORS or file loading errors
+- Try a smaller image file
 
 ## License
 
-MIT
-
-## Author
-
-Generated for MTM Website - Hero 9 Background Effect
+Part of MTM Website - Media Technology Monitor
