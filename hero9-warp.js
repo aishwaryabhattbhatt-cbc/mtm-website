@@ -8,40 +8,72 @@ class NoiseWarpEffect {
   constructor() {
     console.log('Initializing NoiseWarpEffect...');
     
-    // ===== CONFIGURATION - Change these values for faster testing =====
+    // ===== CONFIGURATION - Perlin Noise Fill (Unicorn Studio Style) =====
     this.config = {
-      // Scale & Frequency
-      baseScale: 2.0,           // Base scale multiplier
-      scaleMultiplier: 3.0,     // Additional scale for noise position
-      waveFrequency: 4.0,       // Higher = thinner waves (try 4-10) - REDUCED for fewer waves
-      patternFrequency: 3.0,    // Color gradient frequency
+      // Scale (Unicorn: 10)
+      scale: 10.0,              // Noise scale - larger = bigger waves
       
-      // Distortion & Amplitude
-      distortionAmount: 0.15,   // Wave distortion intensity (0.0 - 1.0)
+      // Amplitude (Unicorn: 100)
+      amplitude: 1.0,           // Wave height/intensity (0.0 - 2.0)
       
-      // Animation Speeds
-      positionSpeed: 0.15,      // Base position animation speed
-      distortionSpeed: 0.2,     // Distortion animation speed
-      patternSpeed: 0.08,       // Color pattern animation speed
-      waveSpeed: 0.1,           // Wave movement speed
+      // Speed (Unicorn: 11)
+      speed: 0.11,              // Overall animation speed multiplier
       
-      // Threshold (Wave Sharpness)
-      thresholdLow: 0.40,       // Lower threshold (0.0 - 0.5) - closer = sharper - WIDER for smoother
-      thresholdHigh: 0.60,      // Upper threshold (0.5 - 1.0) - closer = sharper - WIDER for smoother
+      // Drift (Unicorn: 100)
+      drift: 1.0,               // Continuous flow/drift (0.0 - 2.0)
       
-      // Colors (RGB 0-1 range)
-      colorWhite: { r: 0.95, g: 0.96, b: 0.98 },
-      colorBlue: { r: 0.15, g: 0.45, b: 0.95 },
-      colorPurple: { r: 0.45, g: 0.25, b: 0.85 },
-      colorPink: { r: 0.75, g: 0.35, b: 0.75 },
-      colorTeal: { r: 0.051, g: 0.773, b: 0.494 },
-      colorLightBlue: { r: 0.25, g: 0.55, b: 0.95 },
+      // Color Shift (Unicorn: 55)
+      colorShift: 0.55,         // Color gradient animation speed
+      
+      // Skew (Unicorn: 53)
+      skew: 0.53,               // UV skewing angle (0.0 - 1.0)
+      
+      // Angle (Unicorn: 0)
+      angle: 0.0,               // Rotation angle in degrees (-180 to 180)
+      
+      // Phase (Unicorn: 8)
+      phase: 0.08,              // Noise layer phase offset
+      
+      // Threshold (Unicorn: 50)
+      threshold: 0.5,           // Single threshold for wave separation (0.0 - 1.0)
+      
+      // Mix (Unicorn: 91) - We'll use as blend strength
+      mix: 0.91,                // Color blend mix (0.0 - 1.0)
+      
+      // Legacy compatibility (hidden from GUI)
+      baseScale: 1.4,
+      scaleMultiplier: 6.0,
+      waveFrequency: 2.5,
+      patternFrequency: 3.9,
+      distortionAmount: 0.1,
+      positionSpeed: 0.13,
+      distortionSpeed: 0.03,
+      patternSpeed: 0.03,
+      waveSpeed: 0.03,
+      thresholdLow: 0.24,
+      thresholdHigh: 0.57,
+      
+      // Colors (RGB 0-1 range) - Brightened for vibrant gradients
+      colorWhite: { r: 1.0, g: 1.0, b: 1.0 },
+      colorBlue: { r: 0.3, g: 0.6, b: 1.0 },        // Brighter blue
+      colorPurple: { r: 0.7, g: 0.4, b: 1.0 },      // Brighter purple
+      colorPink: { r: 1.0, g: 0.5, b: 0.9 },        // Brighter pink
+      colorTeal: { r: 0.2, g: 0.9, b: 0.7 },        // Brighter teal
+      colorLightBlue: { r: 0.4, g: 0.8, b: 1.0 },   // Brighter light blue
+      
+      // Color distribution percentages (0-100, will be normalized)
+      colorWhitePercent: 20,
+      colorBluePercent: 20,
+      colorPurplePercent: 20,
+      colorPinkPercent: 20,
+      colorTealPercent: 20,
+      colorLightBluePercent: 20,
 
       // Glyph Dither Controls
-      cellPx: 10.0,            // 6–18 px recommended
-      contrast: 1.4,
-      gamma: 1.0,
-      softness: 0.08,
+      cellPx: 18.0,            // 6–18 px recommended
+      contrast: 2.5,
+      gamma: 2.2,
+      softness: 0.01,
       minR: 0.05,
       maxR: 0.48,
       invert: false,
@@ -49,20 +81,25 @@ class NoiseWarpEffect {
       bayerStrength: 0.04,
 
       // Hero Text Blob
-      blobBlur: 10,
-      blobInset: -110,
-      blobRotate: -4,
-      blobSkew: -6,
-      blobOpacity: 1.0,
-      blobRadiusA: 55,
+      blobBlur: 60,
+      blobInset: -240,
+      blobRotate: -15.5,
+      blobSkew: -20,
+      blobOpacity: 0.63,
+      blobRadiusA: 75,
       blobRadiusB: 45,
-      blobRadiusC: 60,
-      blobRadiusD: 40,
-      blobAnimate: false,
-      blobAnimationSpeed: 1.0,
-      blobNoiseStrength: 0.18,
-      blobNoiseScale: 2.2,
-      blobNoiseSpeed: 0.05
+      blobRadiusC: 72,
+      blobRadiusD: 90,
+      blobAnimate: true,
+      blobAnimationSpeed: 0.9,
+      
+      // Blob Perlin Noise (matches wave noise)
+      blobNoiseScale: 10.0,
+      blobNoiseAmplitude: 0.3,
+      blobNoiseSpeed: 0.11,
+      blobNoiseDrift: 1.0,
+      blobNoisePhase: 0.0,
+      blobNoiseAngle: 0.0
     };
 
     // Auto-load saved settings if present
@@ -77,19 +114,24 @@ class NoiseWarpEffect {
           this.config.colorPink = data.gradientColors.colorPink || this.config.colorPink;
           this.config.colorTeal = data.gradientColors.colorTeal || this.config.colorTeal;
           this.config.colorLightBlue = data.gradientColors.colorLightBlue || this.config.colorLightBlue;
+          this.config.colorWhitePercent = data.gradientColors.colorWhitePercent ?? this.config.colorWhitePercent;
+          this.config.colorBluePercent = data.gradientColors.colorBluePercent ?? this.config.colorBluePercent;
+          this.config.colorPurplePercent = data.gradientColors.colorPurplePercent ?? this.config.colorPurplePercent;
+          this.config.colorPinkPercent = data.gradientColors.colorPinkPercent ?? this.config.colorPinkPercent;
+          this.config.colorTealPercent = data.gradientColors.colorTealPercent ?? this.config.colorTealPercent;
+          this.config.colorLightBluePercent = data.gradientColors.colorLightBluePercent ?? this.config.colorLightBluePercent;
         }
-        if (data.noiseAnimation) {
-          this.config.baseScale = data.noiseAnimation.baseScale ?? this.config.baseScale;
-          this.config.scaleMultiplier = data.noiseAnimation.scaleMultiplier ?? this.config.scaleMultiplier;
-          this.config.waveFrequency = data.noiseAnimation.waveFrequency ?? this.config.waveFrequency;
-          this.config.patternFrequency = data.noiseAnimation.patternFrequency ?? this.config.patternFrequency;
-          this.config.distortionAmount = data.noiseAnimation.distortionAmount ?? this.config.distortionAmount;
-          this.config.positionSpeed = data.noiseAnimation.positionSpeed ?? this.config.positionSpeed;
-          this.config.distortionSpeed = data.noiseAnimation.distortionSpeed ?? this.config.distortionSpeed;
-          this.config.patternSpeed = data.noiseAnimation.patternSpeed ?? this.config.patternSpeed;
-          this.config.waveSpeed = data.noiseAnimation.waveSpeed ?? this.config.waveSpeed;
-          this.config.thresholdLow = data.noiseAnimation.thresholdLow ?? this.config.thresholdLow;
-          this.config.thresholdHigh = data.noiseAnimation.thresholdHigh ?? this.config.thresholdHigh;
+        if (data.perlinNoise) {
+          this.config.scale = data.perlinNoise.scale ?? this.config.scale;
+          this.config.amplitude = data.perlinNoise.amplitude ?? this.config.amplitude;
+          this.config.speed = data.perlinNoise.speed ?? this.config.speed;
+          this.config.drift = data.perlinNoise.drift ?? this.config.drift;
+          this.config.colorShift = data.perlinNoise.colorShift ?? this.config.colorShift;
+          this.config.skew = data.perlinNoise.skew ?? this.config.skew;
+          this.config.angle = data.perlinNoise.angle ?? this.config.angle;
+          this.config.phase = data.perlinNoise.phase ?? this.config.phase;
+          this.config.threshold = data.perlinNoise.threshold ?? this.config.threshold;
+          this.config.mix = data.perlinNoise.mix ?? this.config.mix;
         }
         if (data.glyphDither) {
           this.config.cellPx = data.glyphDither.cellPx ?? this.config.cellPx;
@@ -114,9 +156,12 @@ class NoiseWarpEffect {
           this.config.blobRadiusD = data.heroTextBlob.blobRadiusD ?? this.config.blobRadiusD;
           this.config.blobAnimate = data.heroTextBlob.blobAnimate ?? this.config.blobAnimate;
           this.config.blobAnimationSpeed = data.heroTextBlob.blobAnimationSpeed ?? this.config.blobAnimationSpeed;
-          this.config.blobNoiseStrength = data.heroTextBlob.blobNoiseStrength ?? this.config.blobNoiseStrength;
           this.config.blobNoiseScale = data.heroTextBlob.blobNoiseScale ?? this.config.blobNoiseScale;
+          this.config.blobNoiseAmplitude = data.heroTextBlob.blobNoiseAmplitude ?? this.config.blobNoiseAmplitude;
           this.config.blobNoiseSpeed = data.heroTextBlob.blobNoiseSpeed ?? this.config.blobNoiseSpeed;
+          this.config.blobNoiseDrift = data.heroTextBlob.blobNoiseDrift ?? this.config.blobNoiseDrift;
+          this.config.blobNoisePhase = data.heroTextBlob.blobNoisePhase ?? this.config.blobNoisePhase;
+          this.config.blobNoiseAngle = data.heroTextBlob.blobNoiseAngle ?? this.config.blobNoiseAngle;
         }
       }
     } catch (error) {
@@ -171,26 +216,31 @@ class NoiseWarpEffect {
     // Uniforms - Pass A (Noise Gradient)
     this.uniformsA = {
       uTime: { value: 0 },
-      uScale: { value: this.config.baseScale },
-      uScaleMultiplier: { value: this.config.scaleMultiplier },
-      uWaveFrequency: { value: this.config.waveFrequency },
-      uPatternFrequency: { value: this.config.patternFrequency },
-      uDistortionAmount: { value: this.config.distortionAmount },
-      uPositionSpeed: { value: this.config.positionSpeed },
-      uDistortionSpeed: { value: this.config.distortionSpeed },
-      uPatternSpeed: { value: this.config.patternSpeed },
-      uWaveSpeed: { value: this.config.waveSpeed },
-      uThresholdLow: { value: this.config.thresholdLow },
-      uThresholdHigh: { value: this.config.thresholdHigh },
+      uScale: { value: this.config.scale },
+      uAmplitude: { value: this.config.amplitude },
+      uSpeed: { value: this.config.speed },
+      uDrift: { value: this.config.drift },
+      uColorShift: { value: this.config.colorShift },
+      uSkew: { value: this.config.skew },
+      uAngle: { value: this.config.angle * Math.PI / 180.0 },
+      uPhase: { value: this.config.phase },
+      uThreshold: { value: this.config.threshold },
+      uMix: { value: this.config.mix },
       uColorWhite: { value: new THREE.Vector3(this.config.colorWhite.r, this.config.colorWhite.g, this.config.colorWhite.b) },
       uColorBlue: { value: new THREE.Vector3(this.config.colorBlue.r, this.config.colorBlue.g, this.config.colorBlue.b) },
       uColorPurple: { value: new THREE.Vector3(this.config.colorPurple.r, this.config.colorPurple.g, this.config.colorPurple.b) },
       uColorPink: { value: new THREE.Vector3(this.config.colorPink.r, this.config.colorPink.g, this.config.colorPink.b) },
       uColorTeal: { value: new THREE.Vector3(this.config.colorTeal.r, this.config.colorTeal.g, this.config.colorTeal.b) },
-      uColorLightBlue: { value: new THREE.Vector3(this.config.colorLightBlue.r, this.config.colorLightBlue.g, this.config.colorLightBlue.b) }
+      uColorLightBlue: { value: new THREE.Vector3(this.config.colorLightBlue.r, this.config.colorLightBlue.g, this.config.colorLightBlue.b) },
+      uColorWhitePercent: { value: this.config.colorWhitePercent },
+      uColorBluePercent: { value: this.config.colorBluePercent },
+      uColorPurplePercent: { value: this.config.colorPurplePercent },
+      uColorPinkPercent: { value: this.config.colorPinkPercent },
+      uColorTealPercent: { value: this.config.colorTealPercent },
+      uColorLightBluePercent: { value: this.config.colorLightBluePercent }
     };
 
-    // Uniforms - Pass B (Glyph Dither)
+    // Uniforms - Pass C (Blob Composite)
     this.uniformsC = {
       uSource: { value: this.renderTarget.texture },
       uResolution: { value: new THREE.Vector2(window.innerWidth * dpr, window.innerHeight * dpr) },
@@ -204,9 +254,12 @@ class NoiseWarpEffect {
       uRadiusC: { value: this.config.blobRadiusC / 100 },
       uRadiusD: { value: this.config.blobRadiusD / 100 },
       uTime: { value: 0 },
-      uNoiseStrength: { value: this.config.blobNoiseStrength },
-      uNoiseScale: { value: this.config.blobNoiseScale },
-      uNoiseSpeed: { value: this.config.blobNoiseSpeed }
+      uBlobNoiseScale: { value: this.config.blobNoiseScale },
+      uBlobNoiseAmplitude: { value: this.config.blobNoiseAmplitude },
+      uBlobNoiseSpeed: { value: this.config.blobNoiseSpeed },
+      uBlobNoiseDrift: { value: this.config.blobNoiseDrift },
+      uBlobNoisePhase: { value: this.config.blobNoisePhase },
+      uBlobNoiseAngle: { value: this.config.blobNoiseAngle * Math.PI / 180.0 }
     };
 
     this.uniformsB = {
@@ -234,91 +287,225 @@ class NoiseWarpEffect {
     const fragmentShaderA = `
       uniform float uTime;
       uniform float uScale;
-      uniform float uScaleMultiplier;
-      uniform float uWaveFrequency;
-      uniform float uPatternFrequency;
-      uniform float uDistortionAmount;
-      uniform float uPositionSpeed;
-      uniform float uDistortionSpeed;
-      uniform float uPatternSpeed;
-      uniform float uWaveSpeed;
-      uniform float uThresholdLow;
-      uniform float uThresholdHigh;
+      uniform float uAmplitude;
+      uniform float uSpeed;
+      uniform float uDrift;
+      uniform float uColorShift;
+      uniform float uSkew;
+      uniform float uAngle;
+      uniform float uPhase;
+      uniform float uThreshold;
+      uniform float uMix;
       uniform vec3 uColorWhite;
       uniform vec3 uColorBlue;
       uniform vec3 uColorPurple;
       uniform vec3 uColorPink;
       uniform vec3 uColorTeal;
       uniform vec3 uColorLightBlue;
+      uniform float uColorWhitePercent;
+      uniform float uColorBluePercent;
+      uniform float uColorPurplePercent;
+      uniform float uColorPinkPercent;
+      uniform float uColorTealPercent;
+      uniform float uColorLightBluePercent;
       varying vec2 vUv;
 
-      // Simple noise function
-      float random(vec2 st) {
-        return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+      // Smooth Perlin noise implementation
+      vec2 hash2(vec2 p) {
+        p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
+        return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
       }
 
-      float noise(vec2 st) {
-        vec2 i = floor(st);
-        vec2 f = fract(st);
+      float perlin(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
         
-        float a = random(i);
-        float b = random(i + vec2(1.0, 0.0));
-        float c = random(i + vec2(0.0, 1.0));
-        float d = random(i + vec2(1.0, 1.0));
+        // Smooth interpolation (quintic hermite)
+        vec2 u = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
         
-        vec2 u = f * f * (3.0 - 2.0 * f);
-        
-        return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+        return mix(
+          mix(dot(hash2(i + vec2(0.0, 0.0)), f - vec2(0.0, 0.0)),
+              dot(hash2(i + vec2(1.0, 0.0)), f - vec2(1.0, 0.0)), u.x),
+          mix(dot(hash2(i + vec2(0.0, 1.0)), f - vec2(0.0, 1.0)),
+              dot(hash2(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0)), u.x),
+          u.y
+        );
+      }
+
+      // Rotation matrix
+      mat2 rotate(float angle) {
+        float s = sin(angle);
+        float c = cos(angle);
+        return mat2(c, -s, s, c);
+      }
+
+      // Oklab color space conversions for vibrant gradients
+      vec3 srgb_to_linear(vec3 c) {
+        vec3 v = c / 255.0;
+        return mix(
+          v / 12.92,
+          pow((v + 0.055) / 1.055, vec3(2.4)),
+          step(0.04045, v)
+        );
+      }
+
+      vec3 linear_to_srgb(vec3 c) {
+        vec3 v = mix(
+          12.92 * c,
+          1.055 * pow(c, vec3(1.0/2.4)) - 0.055,
+          step(0.0031308, c)
+        );
+        return v * 255.0;
+      }
+
+      vec3 linear_srgb_to_oklab(vec3 c) {
+        float l = 0.4122214708 * c.r + 0.5363325363 * c.g + 0.0514459929 * c.b;
+        float m = 0.2119034982 * c.r + 0.6806995451 * c.g + 0.1073969566 * c.b;
+        float s = 0.0883024619 * c.r + 0.2817188376 * c.g + 0.6299787005 * c.b;
+
+        float l_ = pow(l, 1.0/3.0);
+        float m_ = pow(m, 1.0/3.0);
+        float s_ = pow(s, 1.0/3.0);
+
+        return vec3(
+          0.2104542553 * l_ + 0.7936177850 * m_ - 0.0040720468 * s_,
+          1.9779984951 * l_ - 2.4285922050 * m_ + 0.4505937099 * s_,
+          0.0259040371 * l_ + 0.7827717662 * m_ - 0.8086757660 * s_
+        );
+      }
+
+      vec3 oklab_to_linear_srgb(vec3 c) {
+        float l_ = c.x + 0.3963377774 * c.y + 0.2158037573 * c.z;
+        float m_ = c.x - 0.1055613458 * c.y - 0.0638541728 * c.z;
+        float s_ = c.x - 0.0894841775 * c.y - 1.2914855480 * c.z;
+
+        float l = l_ * l_ * l_;
+        float m = m_ * m_ * m_;
+        float s = s_ * s_ * s_;
+
+        return vec3(
+          +4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+          -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+          -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s
+        );
+      }
+
+      vec3 rgb_to_oklab(vec3 rgb) {
+        return linear_srgb_to_oklab(srgb_to_linear(rgb * 255.0));
+      }
+
+      vec3 oklab_to_rgb(vec3 oklab) {
+        return linear_to_srgb(oklab_to_linear_srgb(oklab)) / 255.0;
+      }
+
+      vec3 mix_oklab(vec3 color1, vec3 color2, float t) {
+        vec3 lab1 = rgb_to_oklab(color1);
+        vec3 lab2 = rgb_to_oklab(color2);
+        vec3 mixed = mix(lab1, lab2, t);
+        return oklab_to_rgb(mixed);
       }
 
       void main() {
         vec2 uv = vUv;
         
-        // Perlin-style noise for thin waves
-        vec2 pos = uv * uScale * uScaleMultiplier + uTime * uPositionSpeed;
+        // Apply rotation
+        vec2 center = vec2(0.5);
+        vec2 rotatedUv = rotate(uAngle) * (uv - center) + center;
         
-        // Single octave for cleaner wave patterns
-        float n = noise(pos);
+        // Apply skew
+        vec2 skewedUv = rotatedUv;
+        skewedUv.x += rotatedUv.y * uSkew;
         
-        // Subtle distortion for wavy effect
-        vec2 distortion = vec2(
-          noise(pos + uTime * uDistortionSpeed),
-          noise(pos + uTime * uDistortionSpeed + 100.0)
-        );
-        distortion = (distortion - 0.5) * uDistortionAmount;
+        // Time with speed multiplier
+        float t = uTime * uSpeed;
         
-        vec2 distortedUv = uv + distortion;
+        // Base noise position with drift
+        vec2 pos = skewedUv * uScale + vec2(t * uDrift, t * uDrift * 0.5);
         
-        // Color 1: White
-        vec3 color1 = uColorWhite;
+        // Add phase offset
+        pos += uPhase * 10.0;
         
-        // Color 2: Gradient of 5 colors
-        float pattern = noise(distortedUv * uPatternFrequency + uTime * uPatternSpeed);
+        // Smooth Perlin noise with amplitude
+        float n = perlin(pos) * uAmplitude;
         
-        // 5-color gradient
-        vec3 gradColor1 = uColorBlue;
-        vec3 gradColor2 = uColorPurple;
-        vec3 gradColor3 = uColorPink;
-        vec3 gradColor4 = uColorTeal;
-        vec3 gradColor5 = uColorLightBlue;
+        // Threshold creates the wave separation
+        float waves = smoothstep(uThreshold - 0.1, uThreshold + 0.1, n * 0.5 + 0.5);
         
-        // Create smooth gradient through all 5 colors
-        vec3 color2;
-        if (pattern < 0.25) {
-          color2 = mix(gradColor1, gradColor2, pattern * 4.0);
-        } else if (pattern < 0.5) {
-          color2 = mix(gradColor2, gradColor3, (pattern - 0.25) * 4.0);
-        } else if (pattern < 0.75) {
-          color2 = mix(gradColor3, gradColor4, (pattern - 0.5) * 4.0);
+        // Color gradient animation with color shift
+        float pattern = perlin(skewedUv * 3.0 + t * uColorShift) * 0.5 + 0.5;
+        
+        // Dynamic gradient based on color percentages
+        vec3 gradColor;
+        pattern = fract(pattern);
+        
+        // Normalize percentages (white + gradient colors = 100)
+        float total = uColorWhitePercent + uColorBluePercent + uColorPurplePercent + uColorPinkPercent + uColorTealPercent + uColorLightBluePercent;
+        if (total < 0.0001) {
+          total = 1.0;
+        }
+        float whiteNorm = uColorWhitePercent / total;
+        float blueNorm = uColorBluePercent / total;
+        float purpleNorm = uColorPurplePercent / total;
+        float pinkNorm = uColorPinkPercent / total;
+        float tealNorm = uColorTealPercent / total;
+        float lightBlueNorm = uColorLightBluePercent / total;
+        
+        // Calculate cumulative thresholds for each color segment
+        // Each color gets two segments: pure color + transition
+        float whiteEnd = whiteNorm * 0.5;
+        float whiteTrans = whiteNorm;
+        float blueEnd = whiteTrans + blueNorm * 0.5;
+        float blueTrans = whiteTrans + blueNorm;
+        float purpleEnd = blueTrans + purpleNorm * 0.5;
+        float purpleTrans = blueTrans + purpleNorm;
+        float pinkEnd = purpleTrans + pinkNorm * 0.5;
+        float pinkTrans = purpleTrans + pinkNorm;
+        float tealEnd = pinkTrans + tealNorm * 0.5;
+        float tealTrans = pinkTrans + tealNorm;
+        float lightBlueEnd = tealTrans + lightBlueNorm * 0.5;
+        float lightBlueTrans = tealTrans + lightBlueNorm; // Should be 1.0
+        
+        // Assign colors based on dynamic thresholds
+        if (pattern < whiteEnd) {
+          gradColor = mix_oklab(uColorWhite, uColorWhite, pattern / max(whiteEnd, 0.0001)); // Pure white
+        } else if (pattern < whiteTrans) {
+          float t = (pattern - whiteEnd) / max(whiteTrans - whiteEnd, 0.0001);
+          gradColor = mix_oklab(uColorWhite, uColorBlue, t);
+        } else if (pattern < blueEnd) {
+          float t = (pattern - whiteTrans) / max(blueEnd - whiteTrans, 0.0001);
+          gradColor = mix_oklab(uColorBlue, uColorBlue, t); // Pure blue
+        } else if (pattern < blueTrans) {
+          float t = (pattern - blueEnd) / max(blueTrans - blueEnd, 0.0001);
+          gradColor = mix_oklab(uColorBlue, uColorPurple, t);
+        } else if (pattern < purpleEnd) {
+          float t = (pattern - blueTrans) / max(purpleEnd - blueTrans, 0.0001);
+          gradColor = mix_oklab(uColorPurple, uColorPurple, t); // Pure purple
+        } else if (pattern < purpleTrans) {
+          float t = (pattern - purpleEnd) / max(purpleTrans - purpleEnd, 0.0001);
+          gradColor = mix_oklab(uColorPurple, uColorPink, t);
+        } else if (pattern < pinkEnd) {
+          float t = (pattern - purpleTrans) / max(pinkEnd - purpleTrans, 0.0001);
+          gradColor = mix_oklab(uColorPink, uColorPink, t); // Pure pink
+        } else if (pattern < pinkTrans) {
+          float t = (pattern - pinkEnd) / max(pinkTrans - pinkEnd, 0.0001);
+          gradColor = mix_oklab(uColorPink, uColorTeal, t);
+        } else if (pattern < tealEnd) {
+          float t = (pattern - pinkTrans) / max(tealEnd - pinkTrans, 0.0001);
+          gradColor = mix_oklab(uColorTeal, uColorTeal, t); // Pure teal
+        } else if (pattern < tealTrans) {
+          float t = (pattern - tealEnd) / max(tealTrans - tealEnd, 0.0001);
+          gradColor = mix_oklab(uColorTeal, uColorLightBlue, t);
+        } else if (pattern < lightBlueEnd) {
+          float t = (pattern - tealTrans) / max(lightBlueEnd - tealTrans, 0.0001);
+          gradColor = mix_oklab(uColorLightBlue, uColorLightBlue, t); // Pure light blue
         } else {
-          color2 = mix(gradColor4, gradColor5, (pattern - 0.75) * 4.0);
+          float t = (pattern - lightBlueEnd) / max(lightBlueTrans - lightBlueEnd, 0.0001);
+          gradColor = mix_oklab(uColorLightBlue, uColorWhite, t); // Wrap to white
         }
         
-        // Very thin wave separation
-        float waves = noise(distortedUv * uWaveFrequency + uTime * uWaveSpeed);
-        waves = smoothstep(uThresholdLow, uThresholdHigh, waves);
-        
-        vec3 color = mix(color1, color2, waves);
+        // Use threshold to separate colors sharply (no white, no greys)
+        // Saturate the colors by boosting them
+        vec3 color = gradColor * (1.0 + waves * 0.2); // Brighten by 20% in wave areas
         
         gl_FragColor = vec4(color, 1.0);
       }
@@ -338,34 +525,36 @@ class NoiseWarpEffect {
       uniform float uRadiusC;
       uniform float uRadiusD;
       uniform float uTime;
-      uniform float uNoiseStrength;
-      uniform float uNoiseScale;
-      uniform float uNoiseSpeed;
+      uniform float uBlobNoiseScale;
+      uniform float uBlobNoiseAmplitude;
+      uniform float uBlobNoiseSpeed;
+      uniform float uBlobNoiseDrift;
+      uniform float uBlobNoisePhase;
+      uniform float uBlobNoiseAngle;
 
-      float hash(vec2 p) {
-        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+      // Smooth Perlin noise (same as wave noise)
+      vec2 hash2(vec2 p) {
+        p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
+        return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
       }
 
-      float noise(vec2 p) {
+      float perlin(vec2 p) {
         vec2 i = floor(p);
         vec2 f = fract(p);
-        float a = hash(i);
-        float b = hash(i + vec2(1.0, 0.0));
-        float c = hash(i + vec2(0.0, 1.0));
-        float d = hash(i + vec2(1.0, 1.0));
-        vec2 u = f * f * (3.0 - 2.0 * f);
-        return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+        vec2 u = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
+        return mix(
+          mix(dot(hash2(i + vec2(0.0, 0.0)), f - vec2(0.0, 0.0)),
+              dot(hash2(i + vec2(1.0, 0.0)), f - vec2(1.0, 0.0)), u.x),
+          mix(dot(hash2(i + vec2(0.0, 1.0)), f - vec2(0.0, 1.0)),
+              dot(hash2(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0)), u.x),
+          u.y
+        );
       }
 
-      float fbm(vec2 p) {
-        float v = 0.0;
-        float a = 0.5;
-        for (int i = 0; i < 3; i++) {
-          v += a * noise(p);
-          p *= 2.0;
-          a *= 0.5;
-        }
-        return v;
+      mat2 rotate(float angle) {
+        float s = sin(angle);
+        float c = cos(angle);
+        return mat2(c, -s, s, c);
       }
 
       float calcRadius(float t) {
@@ -403,8 +592,13 @@ class NoiseWarpEffect {
         float angle = atan(p.y, p.x);
         float t = (angle + 3.14159265) / (6.2831853);
         float radius = calcRadius(t);
-        float n = fbm(p * uNoiseScale + uTime * uNoiseSpeed);
-        radius += (n - 0.5) * uNoiseStrength;
+        
+        // Apply Perlin noise to blob edge (matches wave animation)
+        vec2 noiseUv = rotate(uBlobNoiseAngle) * p;
+        float time = uTime * uBlobNoiseSpeed;
+        vec2 noisePos = noiseUv * uBlobNoiseScale + vec2(time * uBlobNoiseDrift, time * uBlobNoiseDrift * 0.5) + uBlobNoisePhase * 10.0;
+        float n = perlin(noisePos) * uBlobNoiseAmplitude;
+        radius += n;
 
         float blurNorm = clamp((uBlobBlurPx / min(rectSize.x, rectSize.y)) * 2.0, 0.02, 0.35);
         float inner = max(0.0, radius - blurNorm);
@@ -532,12 +726,36 @@ class NoiseWarpEffect {
     this.uniformsC.uTime.value += 0.016;
     this.animateBlob();
     this.updateBlobRect();
-    this.renderer.setRenderTarget(this.renderTarget);
-    this.renderer.render(this.sceneA, this.camera);
-    this.renderer.setRenderTarget(this.renderTargetComposite);
-    this.renderer.render(this.sceneC, this.camera);
-    this.renderer.setRenderTarget(null);
-    this.renderer.render(this.sceneB, this.camera);
+
+    // Pass A: Noise Animation
+    if (this.layerToggles.noiseAnimation) {
+      this.renderer.setRenderTarget(this.renderTarget);
+      this.renderer.render(this.sceneA, this.camera);
+    }
+
+    // Pass C: Blob Composite
+    if (this.layerToggles.blob) {
+      this.renderer.setRenderTarget(this.renderTargetComposite);
+      this.renderer.render(this.sceneC, this.camera);
+    }
+
+    // Pass B: Glyph Dither (final output)
+    if (this.layerToggles.glyphDither) {
+      this.renderer.setRenderTarget(null);
+      this.renderer.render(this.sceneB, this.camera);
+    } else if (this.layerToggles.blob) {
+      // If dither is off but blob is on, show the composite
+      this.renderer.setRenderTarget(null);
+      this.renderer.render(this.sceneC, this.camera);
+    } else if (this.layerToggles.noiseAnimation) {
+      // If both dither and blob are off but noise is on, show the noise
+      this.renderer.setRenderTarget(null);
+      this.renderer.render(this.sceneA, this.camera);
+    } else {
+      // All WebGL layers off, clear to black
+      this.renderer.setRenderTarget(null);
+      this.renderer.clear();
+    }
   };
 
   applyBlobStyles() {
@@ -561,9 +779,12 @@ class NoiseWarpEffect {
     this.uniformsC.uRadiusB.value = this.config.blobRadiusB / 100;
     this.uniformsC.uRadiusC.value = this.config.blobRadiusC / 100;
     this.uniformsC.uRadiusD.value = this.config.blobRadiusD / 100;
-    this.uniformsC.uNoiseStrength.value = this.config.blobNoiseStrength;
-    this.uniformsC.uNoiseScale.value = this.config.blobNoiseScale;
-    this.uniformsC.uNoiseSpeed.value = this.config.blobNoiseSpeed;
+    this.uniformsC.uBlobNoiseScale.value = this.config.blobNoiseScale;
+    this.uniformsC.uBlobNoiseAmplitude.value = this.config.blobNoiseAmplitude;
+    this.uniformsC.uBlobNoiseSpeed.value = this.config.blobNoiseSpeed;
+    this.uniformsC.uBlobNoiseDrift.value = this.config.blobNoiseDrift;
+    this.uniformsC.uBlobNoisePhase.value = this.config.blobNoisePhase;
+    this.uniformsC.uBlobNoiseAngle.value = this.config.blobNoiseAngle * Math.PI / 180.0;
   }
 
   updateBlobRect() {
@@ -594,8 +815,10 @@ class NoiseWarpEffect {
     }
     const t = (performance.now() - this.blobStartTime) * 0.001 * this.config.blobAnimationSpeed;
     const rot = this.config.blobRotate + Math.sin(t) * 2.0;
+    const skew = this.config.blobSkew + Math.sin(t * 0.7) * 3.0;
     const radiusDelta = Math.sin(t * 0.9) * 5.0;
     this.uniformsC.uBlobRotate.value = rot;
+    this.uniformsC.uBlobSkew.value = skew;
     this.uniformsC.uRadiusA.value = (this.config.blobRadiusA + radiusDelta) / 100;
     this.uniformsC.uRadiusB.value = (this.config.blobRadiusB - radiusDelta) / 100;
     this.uniformsC.uRadiusC.value = (this.config.blobRadiusC + radiusDelta) / 100;
@@ -626,6 +849,84 @@ class NoiseWarpEffect {
     title.style.fontWeight = '700';
     title.style.marginBottom = '4px';
 
+    // Layer toggle states
+    this.layerToggles = {
+      noiseAnimation: true,
+      glyphDither: true,
+      blob: true,
+      grain: true
+    };
+
+    const makeAccordion = (label, defaultOpen = true) => {
+      const container = document.createElement('div');
+      container.style.marginTop = '8px';
+      
+      const header = document.createElement('div');
+      header.style.fontWeight = '600';
+      header.style.padding = '8px';
+      header.style.background = 'rgba(0,0,0,0.04)';
+      header.style.borderRadius = '6px';
+      header.style.cursor = 'pointer';
+      header.style.display = 'flex';
+      header.style.justifyContent = 'space-between';
+      header.style.alignItems = 'center';
+      header.style.userSelect = 'none';
+      
+      const labelSpan = document.createElement('span');
+      labelSpan.textContent = label;
+      
+      const arrow = document.createElement('span');
+      arrow.textContent = defaultOpen ? '▼' : '▶';
+      arrow.style.fontSize = '10px';
+      
+      header.appendChild(labelSpan);
+      header.appendChild(arrow);
+      
+      const content = document.createElement('div');
+      content.style.display = defaultOpen ? 'grid' : 'none';
+      content.style.gap = '8px';
+      content.style.padding = '8px 0';
+      
+      header.addEventListener('click', () => {
+        const isOpen = content.style.display === 'grid';
+        content.style.display = isOpen ? 'none' : 'grid';
+        arrow.textContent = isOpen ? '▶' : '▼';
+      });
+      
+      container.appendChild(header);
+      container.appendChild(content);
+      
+      return { container, content };
+    };
+
+    const makeLayerToggle = (label, layerKey, onChange) => {
+      const wrapper = document.createElement('div');
+      wrapper.style.display = 'flex';
+      wrapper.style.justifyContent = 'space-between';
+      wrapper.style.alignItems = 'center';
+      wrapper.style.padding = '6px';
+      wrapper.style.background = 'rgba(0,120,255,0.05)';
+      wrapper.style.borderRadius = '4px';
+      wrapper.style.marginBottom = '4px';
+      
+      const labelSpan = document.createElement('span');
+      labelSpan.textContent = label;
+      labelSpan.style.fontWeight = '500';
+      
+      const toggle = document.createElement('input');
+      toggle.type = 'checkbox';
+      toggle.checked = this.layerToggles[layerKey];
+      toggle.style.cursor = 'pointer';
+      toggle.addEventListener('change', () => {
+        this.layerToggles[layerKey] = toggle.checked;
+        onChange(toggle.checked);
+      });
+      
+      wrapper.appendChild(labelSpan);
+      wrapper.appendChild(toggle);
+      return wrapper;
+    };
+
     const section = (label) => {
       const el = document.createElement('div');
       el.textContent = label;
@@ -645,14 +946,37 @@ class NoiseWarpEffect {
     };
 
     const makeRange = (min, max, step, value, onInput) => {
+      const wrapper = document.createElement('div');
+      wrapper.style.display = 'flex';
+      wrapper.style.gap = '8px';
+      wrapper.style.alignItems = 'center';
+      
       const input = document.createElement('input');
       input.type = 'range';
       input.min = min;
       input.max = max;
       input.step = step;
       input.value = value;
-      input.addEventListener('input', () => onInput(parseFloat(input.value)));
-      return input;
+      input.style.flex = '1';
+      
+      const valueSpan = document.createElement('span');
+      valueSpan.textContent = value;
+      valueSpan.style.minWidth = '45px';
+      valueSpan.style.fontSize = '11px';
+      valueSpan.style.color = '#666';
+      valueSpan.style.textAlign = 'right';
+      
+      input.addEventListener('input', () => {
+        const val = parseFloat(input.value);
+        valueSpan.textContent = val;
+        onInput(val);
+      });
+      
+      wrapper.appendChild(input);
+      wrapper.appendChild(valueSpan);
+      wrapper.input = input;
+      wrapper.valueSpan = valueSpan;
+      return wrapper;
     };
 
     const makeCheckbox = (checked, onChange) => {
@@ -695,20 +1019,25 @@ class NoiseWarpEffect {
           colorPurple: c(this.uniformsA.uColorPurple.value),
           colorPink: c(this.uniformsA.uColorPink.value),
           colorTeal: c(this.uniformsA.uColorTeal.value),
-          colorLightBlue: c(this.uniformsA.uColorLightBlue.value)
+          colorLightBlue: c(this.uniformsA.uColorLightBlue.value),
+          colorWhitePercent: this.config.colorWhitePercent,
+          colorBluePercent: this.config.colorBluePercent,
+          colorPurplePercent: this.config.colorPurplePercent,
+          colorPinkPercent: this.config.colorPinkPercent,
+          colorTealPercent: this.config.colorTealPercent,
+          colorLightBluePercent: this.config.colorLightBluePercent
         },
-        noiseAnimation: {
-          baseScale: this.uniformsA.uScale.value,
-          scaleMultiplier: this.uniformsA.uScaleMultiplier.value,
-          waveFrequency: this.uniformsA.uWaveFrequency.value,
-          patternFrequency: this.uniformsA.uPatternFrequency.value,
-          distortionAmount: this.uniformsA.uDistortionAmount.value,
-          positionSpeed: this.uniformsA.uPositionSpeed.value,
-          distortionSpeed: this.uniformsA.uDistortionSpeed.value,
-          patternSpeed: this.uniformsA.uPatternSpeed.value,
-          waveSpeed: this.uniformsA.uWaveSpeed.value,
-          thresholdLow: this.uniformsA.uThresholdLow.value,
-          thresholdHigh: this.uniformsA.uThresholdHigh.value
+        perlinNoise: {
+          scale: this.config.scale,
+          amplitude: this.config.amplitude,
+          speed: this.config.speed,
+          drift: this.config.drift,
+          colorShift: this.config.colorShift,
+          skew: this.config.skew,
+          angle: this.config.angle,
+          phase: this.config.phase,
+          threshold: this.config.threshold,
+          mix: this.config.mix
         },
         glyphDither: {
           cellPx: this.uniformsB.uCellPx.value,
@@ -733,9 +1062,12 @@ class NoiseWarpEffect {
           blobRadiusD: this.config.blobRadiusD,
           blobAnimate: this.config.blobAnimate,
           blobAnimationSpeed: this.config.blobAnimationSpeed,
-          blobNoiseStrength: this.config.blobNoiseStrength,
           blobNoiseScale: this.config.blobNoiseScale,
-          blobNoiseSpeed: this.config.blobNoiseSpeed
+          blobNoiseAmplitude: this.config.blobNoiseAmplitude,
+          blobNoiseSpeed: this.config.blobNoiseSpeed,
+          blobNoiseDrift: this.config.blobNoiseDrift,
+          blobNoisePhase: this.config.blobNoisePhase,
+          blobNoiseAngle: this.config.blobNoiseAngle
         }
       };
     };
@@ -759,46 +1091,56 @@ class NoiseWarpEffect {
       localStorage.setItem('hero9Settings', JSON.stringify(data));
     };
 
+    panel.appendChild(title);
+
+    // Layer toggles section
+    const layersSection = makeAccordion('Layer Visibility', true);
+    layersSection.content.appendChild(makeLayerToggle('Noise Animation', 'noiseAnimation', (enabled) => {
+      // Handled in render loop
+    }));
+    layersSection.content.appendChild(makeLayerToggle('Glyph Dither', 'glyphDither', (enabled) => {
+      // Handled in render loop
+    }));
+    layersSection.content.appendChild(makeLayerToggle('Hero Text Blob', 'blob', (enabled) => {
+      // Handled in render loop
+    }));
+    layersSection.content.appendChild(makeLayerToggle('Grain Overlay', 'grain', (enabled) => {
+      const grainEl = document.querySelector('.grain-overlay');
+      if (grainEl) grainEl.style.display = enabled ? 'block' : 'none';
+    }));
+    panel.appendChild(layersSection.container);
+
+    // Glyph Dither section
+    const glyphSection = makeAccordion('Glyph Dither', false);
+    
     const cellLabel = makeLabel('Cell Size (px)');
-    cellLabel.appendChild(makeRange(6, 18, 1, this.config.cellPx, (v) => {
+    cellLabel.appendChild(makeRange(1, 36, 1, this.config.cellPx, (v) => {
       this.uniformsB.uCellPx.value = v;
     }));
 
     const contrastLabel = makeLabel('Contrast');
-    contrastLabel.appendChild(makeRange(0.5, 2.5, 0.05, this.config.contrast, (v) => {
+    contrastLabel.appendChild(makeRange(0.5, 5.0, 0.05, this.config.contrast, (v) => {
       this.uniformsB.uContrast.value = v;
     }));
 
     const gammaLabel = makeLabel('Gamma');
-    gammaLabel.appendChild(makeRange(0.5, 2.2, 0.05, this.config.gamma, (v) => {
+    gammaLabel.appendChild(makeRange(0.5, 4.5, 0.05, this.config.gamma, (v) => {
       this.uniformsB.uGamma.value = v;
     }));
 
     const softLabel = makeLabel('Dot Softness');
-    softLabel.appendChild(makeRange(0.01, 0.2, 0.01, this.config.softness, (v) => {
+    softLabel.appendChild(makeRange(0.0, 0.5, 0.01, this.config.softness, (v) => {
       this.uniformsB.uSoftness.value = v;
     }));
 
-    const invertLabel = makeLabel('Invert');
-    invertLabel.appendChild(makeCheckbox(this.config.invert, (v) => {
-      this.uniformsB.uInvert.value = v ? 1.0 : 0.0;
-    }));
+    glyphSection.content.appendChild(cellLabel);
+    glyphSection.content.appendChild(contrastLabel);
+    glyphSection.content.appendChild(gammaLabel);
+    glyphSection.content.appendChild(softLabel);
+    panel.appendChild(glyphSection.container);
 
-    const bayerLabel = makeLabel('Bayer Dither');
-    bayerLabel.appendChild(makeCheckbox(this.config.bayer, (v) => {
-      this.uniformsB.uBayer.value = v ? 1.0 : 0.0;
-    }));
-
-    panel.appendChild(title);
-    panel.appendChild(section('Glyph Dither'));
-    panel.appendChild(cellLabel);
-    panel.appendChild(contrastLabel);
-    panel.appendChild(gammaLabel);
-    panel.appendChild(softLabel);
-    panel.appendChild(invertLabel);
-    panel.appendChild(bayerLabel);
-
-    panel.appendChild(section('Gradient Colors'));
+    // Gradient Colors section
+    const colorsSection = makeAccordion('Gradient Colors', false);
 
     const whiteLabel = makeLabel('White');
     whiteLabel.appendChild(makeColor(rgbToHex(this.config.colorWhite), (hex) => {
@@ -836,134 +1178,243 @@ class NoiseWarpEffect {
       this.uniformsA.uColorLightBlue.value.set(c.r, c.g, c.b);
     }));
 
-    panel.appendChild(whiteLabel);
-    panel.appendChild(blueLabel);
-    panel.appendChild(purpleLabel);
-    panel.appendChild(pinkLabel);
-    panel.appendChild(tealLabel);
-    panel.appendChild(lightBlueLabel);
+    const whitePercentLabel = makeLabel('White %');
+    const whitePercentRange = makeRange(0, 100, 1, this.config.colorWhitePercent, (v) => {
+      this.config.colorWhitePercent = v;
+      normalizeColorPercents('colorWhitePercent');
+    });
+    whitePercentLabel.appendChild(whitePercentRange);
 
-    panel.appendChild(section('Noise Animation'));
+    const bluePercentLabel = makeLabel('Blue %');
+    const bluePercentRange = makeRange(0, 100, 1, this.config.colorBluePercent, (v) => {
+      this.config.colorBluePercent = v;
+      normalizeColorPercents('colorBluePercent');
+    });
+    bluePercentLabel.appendChild(bluePercentRange);
 
-    const scaleLabel = makeLabel('Base Scale');
-    scaleLabel.appendChild(makeRange(0.5, 5.0, 0.1, this.config.baseScale, (v) => {
+    const purplePercentLabel = makeLabel('Purple %');
+    const purplePercentRange = makeRange(0, 100, 1, this.config.colorPurplePercent, (v) => {
+      this.config.colorPurplePercent = v;
+      normalizeColorPercents('colorPurplePercent');
+    });
+    purplePercentLabel.appendChild(purplePercentRange);
+
+    const pinkPercentLabel = makeLabel('Pink %');
+    const pinkPercentRange = makeRange(0, 100, 1, this.config.colorPinkPercent, (v) => {
+      this.config.colorPinkPercent = v;
+      normalizeColorPercents('colorPinkPercent');
+    });
+    pinkPercentLabel.appendChild(pinkPercentRange);
+
+    const tealPercentLabel = makeLabel('Teal %');
+    const tealPercentRange = makeRange(0, 100, 1, this.config.colorTealPercent, (v) => {
+      this.config.colorTealPercent = v;
+      normalizeColorPercents('colorTealPercent');
+    });
+    tealPercentLabel.appendChild(tealPercentRange);
+
+    const lightBluePercentLabel = makeLabel('Light Blue %');
+    const lightBluePercentRange = makeRange(0, 100, 1, this.config.colorLightBluePercent, (v) => {
+      this.config.colorLightBluePercent = v;
+      normalizeColorPercents('colorLightBluePercent');
+    });
+    lightBluePercentLabel.appendChild(lightBluePercentRange);
+
+    const percentControls = [
+      { key: 'colorWhitePercent', uniform: 'uColorWhitePercent', range: whitePercentRange },
+      { key: 'colorBluePercent', uniform: 'uColorBluePercent', range: bluePercentRange },
+      { key: 'colorPurplePercent', uniform: 'uColorPurplePercent', range: purplePercentRange },
+      { key: 'colorPinkPercent', uniform: 'uColorPinkPercent', range: pinkPercentRange },
+      { key: 'colorTealPercent', uniform: 'uColorTealPercent', range: tealPercentRange },
+      { key: 'colorLightBluePercent', uniform: 'uColorLightBluePercent', range: lightBluePercentRange }
+    ];
+
+    const syncPercentUI = () => {
+      percentControls.forEach(({ key, uniform, range }) => {
+        const val = Math.max(0, Math.min(100, Math.round(this.config[key])));
+        this.config[key] = val;
+        this.uniformsA[uniform].value = val;
+        range.input.value = val;
+        range.valueSpan.textContent = val;
+      });
+    };
+
+    const normalizeColorPercents = (changedKey) => {
+      const keys = percentControls.map((c) => c.key);
+      const fixed = Math.max(0, Math.min(100, Math.round(this.config[changedKey])));
+      this.config[changedKey] = fixed;
+
+      const remainingKeys = keys.filter((k) => k !== changedKey);
+      const remainingTotal = remainingKeys.reduce((sum, k) => sum + this.config[k], 0);
+      const targetRemaining = Math.max(0, 100 - fixed);
+
+      if (remainingKeys.length > 0) {
+        if (remainingTotal <= 0) {
+          const even = targetRemaining / remainingKeys.length;
+          remainingKeys.forEach((k) => { this.config[k] = even; });
+        } else {
+          const scale = targetRemaining / remainingTotal;
+          remainingKeys.forEach((k) => { this.config[k] = this.config[k] * scale; });
+        }
+
+        // Round and fix any leftover due to rounding
+        let roundedSum = fixed;
+        remainingKeys.forEach((k, idx) => {
+          const isLast = idx === remainingKeys.length - 1;
+          const rounded = isLast
+            ? Math.max(0, Math.round(targetRemaining - (roundedSum - fixed)))
+            : Math.max(0, Math.round(this.config[k]));
+          this.config[k] = rounded;
+          roundedSum += rounded;
+        });
+      }
+
+      syncPercentUI();
+    };
+
+    colorsSection.content.appendChild(whiteLabel);
+    colorsSection.content.appendChild(blueLabel);
+    colorsSection.content.appendChild(purpleLabel);
+    colorsSection.content.appendChild(pinkLabel);
+    colorsSection.content.appendChild(tealLabel);
+    colorsSection.content.appendChild(lightBlueLabel);
+    colorsSection.content.appendChild(whitePercentLabel);
+    colorsSection.content.appendChild(bluePercentLabel);
+    colorsSection.content.appendChild(purplePercentLabel);
+    colorsSection.content.appendChild(pinkPercentLabel);
+    colorsSection.content.appendChild(tealPercentLabel);
+    colorsSection.content.appendChild(lightBluePercentLabel);
+    normalizeColorPercents('colorWhitePercent');
+    panel.appendChild(colorsSection.container);
+
+    // Perlin Noise Animation section
+    const noiseSection = makeAccordion('Perlin Noise Fill', true);
+
+    const scaleLabel = makeLabel('Scale');
+    scaleLabel.appendChild(makeRange(1.0, 30.0, 0.1, this.config.scale, (v) => {
+      this.config.scale = v;
       this.uniformsA.uScale.value = v;
     }));
 
-    const scaleMultLabel = makeLabel('Scale Multiplier');
-    scaleMultLabel.appendChild(makeRange(0.5, 6.0, 0.1, this.config.scaleMultiplier, (v) => {
-      this.uniformsA.uScaleMultiplier.value = v;
+    const amplitudeLabel = makeLabel('Amplitude');
+    amplitudeLabel.appendChild(makeRange(0.0, 2.0, 0.01, this.config.amplitude, (v) => {
+      this.config.amplitude = v;
+      this.uniformsA.uAmplitude.value = v;
     }));
 
-    const waveFreqLabel = makeLabel('Wave Frequency');
-    waveFreqLabel.appendChild(makeRange(1.0, 10.0, 0.1, this.config.waveFrequency, (v) => {
-      this.uniformsA.uWaveFrequency.value = v;
+    const speedLabel = makeLabel('Speed');
+    speedLabel.appendChild(makeRange(0.0, 1.0, 0.01, this.config.speed, (v) => {
+      this.config.speed = v;
+      this.uniformsA.uSpeed.value = v;
     }));
 
-    const patternFreqLabel = makeLabel('Pattern Frequency');
-    patternFreqLabel.appendChild(makeRange(0.5, 8.0, 0.1, this.config.patternFrequency, (v) => {
-      this.uniformsA.uPatternFrequency.value = v;
+    const driftLabel = makeLabel('Drift');
+    driftLabel.appendChild(makeRange(0.0, 2.0, 0.01, this.config.drift, (v) => {
+      this.config.drift = v;
+      this.uniformsA.uDrift.value = v;
     }));
 
-    const distortionLabel = makeLabel('Distortion Amount');
-    distortionLabel.appendChild(makeRange(0.0, 0.6, 0.01, this.config.distortionAmount, (v) => {
-      this.uniformsA.uDistortionAmount.value = v;
+    const colorShiftLabel = makeLabel('Color Shift');
+    colorShiftLabel.appendChild(makeRange(0.0, 2.0, 0.01, this.config.colorShift, (v) => {
+      this.config.colorShift = v;
+      this.uniformsA.uColorShift.value = v;
     }));
 
-    const posSpeedLabel = makeLabel('Position Speed');
-    posSpeedLabel.appendChild(makeRange(0.0, 1.0, 0.01, this.config.positionSpeed, (v) => {
-      this.uniformsA.uPositionSpeed.value = v;
+    const skewLabel = makeLabel('Skew');
+    skewLabel.appendChild(makeRange(0.0, 2.0, 0.01, this.config.skew, (v) => {
+      this.config.skew = v;
+      this.uniformsA.uSkew.value = v;
     }));
 
-    const distSpeedLabel = makeLabel('Distortion Speed');
-    distSpeedLabel.appendChild(makeRange(0.0, 1.0, 0.01, this.config.distortionSpeed, (v) => {
-      this.uniformsA.uDistortionSpeed.value = v;
+    const angleLabel = makeLabel('Angle');
+    angleLabel.appendChild(makeRange(-180, 180, 1, this.config.angle, (v) => {
+      this.config.angle = v;
+      this.uniformsA.uAngle.value = v * Math.PI / 180.0;
     }));
 
-    const patternSpeedLabel = makeLabel('Pattern Speed');
-    patternSpeedLabel.appendChild(makeRange(0.0, 1.0, 0.01, this.config.patternSpeed, (v) => {
-      this.uniformsA.uPatternSpeed.value = v;
+    const phaseLabel = makeLabel('Phase');
+    phaseLabel.appendChild(makeRange(0.0, 1.0, 0.01, this.config.phase, (v) => {
+      this.config.phase = v;
+      this.uniformsA.uPhase.value = v;
     }));
 
-    const waveSpeedLabel = makeLabel('Wave Speed');
-    waveSpeedLabel.appendChild(makeRange(0.0, 1.0, 0.01, this.config.waveSpeed, (v) => {
-      this.uniformsA.uWaveSpeed.value = v;
+    const thresholdLabel = makeLabel('Threshold');
+    thresholdLabel.appendChild(makeRange(0.0, 1.0, 0.01, this.config.threshold, (v) => {
+      this.config.threshold = v;
+      this.uniformsA.uThreshold.value = v;
     }));
 
-    const thresholdLowLabel = makeLabel('Threshold Low');
-    thresholdLowLabel.appendChild(makeRange(0.0, 0.6, 0.01, this.config.thresholdLow, (v) => {
-      this.uniformsA.uThresholdLow.value = v;
+    const mixLabel = makeLabel('Mix');
+    mixLabel.appendChild(makeRange(0.0, 1.0, 0.01, this.config.mix, (v) => {
+      this.config.mix = v;
+      this.uniformsA.uMix.value = v;
     }));
 
-    const thresholdHighLabel = makeLabel('Threshold High');
-    thresholdHighLabel.appendChild(makeRange(0.4, 1.0, 0.01, this.config.thresholdHigh, (v) => {
-      this.uniformsA.uThresholdHigh.value = v;
-    }));
+    noiseSection.content.appendChild(scaleLabel);
+    noiseSection.content.appendChild(amplitudeLabel);
+    noiseSection.content.appendChild(speedLabel);
+    noiseSection.content.appendChild(driftLabel);
+    noiseSection.content.appendChild(colorShiftLabel);
+    noiseSection.content.appendChild(skewLabel);
+    noiseSection.content.appendChild(angleLabel);
+    noiseSection.content.appendChild(phaseLabel);
+    noiseSection.content.appendChild(thresholdLabel);
+    noiseSection.content.appendChild(mixLabel);
+    panel.appendChild(noiseSection.container);
 
-    panel.appendChild(scaleLabel);
-    panel.appendChild(scaleMultLabel);
-    panel.appendChild(waveFreqLabel);
-    panel.appendChild(patternFreqLabel);
-    panel.appendChild(distortionLabel);
-    panel.appendChild(posSpeedLabel);
-    panel.appendChild(distSpeedLabel);
-    panel.appendChild(patternSpeedLabel);
-    panel.appendChild(waveSpeedLabel);
-    panel.appendChild(thresholdLowLabel);
-    panel.appendChild(thresholdHighLabel);
-
-    panel.appendChild(section('Hero Text Mask Blob'));
+    // Hero Text Blob section
+    const blobSection = makeAccordion('Hero Text Mask Blob', false);
 
     const blobBlurLabel = makeLabel('Blob Blur');
-    blobBlurLabel.appendChild(makeRange(0, 60, 1, this.config.blobBlur, (v) => {
+    blobBlurLabel.appendChild(makeRange(0, 150, 1, this.config.blobBlur, (v) => {
       this.config.blobBlur = v;
       this.applyBlobStyles();
     }));
 
     const blobInsetLabel = makeLabel('Blob Inset');
-    blobInsetLabel.appendChild(makeRange(-240, -20, 1, this.config.blobInset, (v) => {
+    blobInsetLabel.appendChild(makeRange(-500, 50, 1, this.config.blobInset, (v) => {
       this.config.blobInset = v;
       this.applyBlobStyles();
     }));
 
     const blobRotateLabel = makeLabel('Blob Rotate');
-    blobRotateLabel.appendChild(makeRange(-30, 30, 0.5, this.config.blobRotate, (v) => {
+    blobRotateLabel.appendChild(makeRange(-90, 90, 0.5, this.config.blobRotate, (v) => {
       this.config.blobRotate = v;
       this.applyBlobStyles();
     }));
 
     const blobSkewLabel = makeLabel('Blob Skew');
-    blobSkewLabel.appendChild(makeRange(-30, 30, 0.5, this.config.blobSkew, (v) => {
+    blobSkewLabel.appendChild(makeRange(-60, 60, 0.5, this.config.blobSkew, (v) => {
       this.config.blobSkew = v;
       this.applyBlobStyles();
     }));
 
     const blobOpacityLabel = makeLabel('Blob Opacity');
-    blobOpacityLabel.appendChild(makeRange(0.5, 1.0, 0.01, this.config.blobOpacity, (v) => {
+    blobOpacityLabel.appendChild(makeRange(0.0, 1.0, 0.01, this.config.blobOpacity, (v) => {
       this.config.blobOpacity = v;
       this.applyBlobStyles();
     }));
 
     const blobRadiusALabel = makeLabel('Radius A');
-    blobRadiusALabel.appendChild(makeRange(10, 90, 1, this.config.blobRadiusA, (v) => {
+    blobRadiusALabel.appendChild(makeRange(5, 150, 1, this.config.blobRadiusA, (v) => {
       this.config.blobRadiusA = v;
       this.applyBlobStyles();
     }));
 
     const blobRadiusBLabel = makeLabel('Radius B');
-    blobRadiusBLabel.appendChild(makeRange(10, 90, 1, this.config.blobRadiusB, (v) => {
+    blobRadiusBLabel.appendChild(makeRange(5, 150, 1, this.config.blobRadiusB, (v) => {
       this.config.blobRadiusB = v;
       this.applyBlobStyles();
     }));
 
     const blobRadiusCLabel = makeLabel('Radius C');
-    blobRadiusCLabel.appendChild(makeRange(10, 90, 1, this.config.blobRadiusC, (v) => {
+    blobRadiusCLabel.appendChild(makeRange(5, 150, 1, this.config.blobRadiusC, (v) => {
       this.config.blobRadiusC = v;
       this.applyBlobStyles();
     }));
 
     const blobRadiusDLabel = makeLabel('Radius D');
-    blobRadiusDLabel.appendChild(makeRange(10, 90, 1, this.config.blobRadiusD, (v) => {
+    blobRadiusDLabel.appendChild(makeRange(5, 180, 1, this.config.blobRadiusD, (v) => {
       this.config.blobRadiusD = v;
       this.applyBlobStyles();
     }));
@@ -975,43 +1426,66 @@ class NoiseWarpEffect {
     }));
 
     const blobSpeedLabel = makeLabel('Animation Speed');
-    blobSpeedLabel.appendChild(makeRange(0.2, 3.0, 0.1, this.config.blobAnimationSpeed, (v) => {
+    blobSpeedLabel.appendChild(makeRange(0.0, 5.0, 0.1, this.config.blobAnimationSpeed, (v) => {
       this.config.blobAnimationSpeed = v;
     }));
 
-    const blobNoiseStrengthLabel = makeLabel('Noise Strength');
-    blobNoiseStrengthLabel.appendChild(makeRange(0.0, 0.6, 0.01, this.config.blobNoiseStrength, (v) => {
-      this.config.blobNoiseStrength = v;
-      this.applyBlobStyles();
-    }));
-
     const blobNoiseScaleLabel = makeLabel('Noise Scale');
-    blobNoiseScaleLabel.appendChild(makeRange(0.5, 6.0, 0.1, this.config.blobNoiseScale, (v) => {
+    blobNoiseScaleLabel.appendChild(makeRange(1.0, 30.0, 0.1, this.config.blobNoiseScale, (v) => {
       this.config.blobNoiseScale = v;
       this.applyBlobStyles();
     }));
 
+    const blobNoiseAmplitudeLabel = makeLabel('Noise Amplitude');
+    blobNoiseAmplitudeLabel.appendChild(makeRange(0.0, 1.0, 0.01, this.config.blobNoiseAmplitude, (v) => {
+      this.config.blobNoiseAmplitude = v;
+      this.applyBlobStyles();
+    }));
+
     const blobNoiseSpeedLabel = makeLabel('Noise Speed');
-    blobNoiseSpeedLabel.appendChild(makeRange(0.0, 0.5, 0.01, this.config.blobNoiseSpeed, (v) => {
+    blobNoiseSpeedLabel.appendChild(makeRange(0.0, 1.0, 0.01, this.config.blobNoiseSpeed, (v) => {
       this.config.blobNoiseSpeed = v;
       this.applyBlobStyles();
     }));
 
-    panel.appendChild(blobBlurLabel);
-    panel.appendChild(blobInsetLabel);
-    panel.appendChild(blobRotateLabel);
-    panel.appendChild(blobSkewLabel);
-    panel.appendChild(blobOpacityLabel);
-    panel.appendChild(blobRadiusALabel);
-    panel.appendChild(blobRadiusBLabel);
-    panel.appendChild(blobRadiusCLabel);
-    panel.appendChild(blobRadiusDLabel);
-    panel.appendChild(blobAnimateLabel);
-    panel.appendChild(blobSpeedLabel);
-    panel.appendChild(blobNoiseStrengthLabel);
-    panel.appendChild(blobNoiseScaleLabel);
-    panel.appendChild(blobNoiseSpeedLabel);
+    const blobNoiseDriftLabel = makeLabel('Noise Drift');
+    blobNoiseDriftLabel.appendChild(makeRange(0.0, 2.0, 0.01, this.config.blobNoiseDrift, (v) => {
+      this.config.blobNoiseDrift = v;
+      this.applyBlobStyles();
+    }));
 
+    const blobNoisePhaseLabel = makeLabel('Noise Phase');
+    blobNoisePhaseLabel.appendChild(makeRange(0.0, 1.0, 0.01, this.config.blobNoisePhase, (v) => {
+      this.config.blobNoisePhase = v;
+      this.applyBlobStyles();
+    }));
+
+    const blobNoiseAngleLabel = makeLabel('Noise Angle');
+    blobNoiseAngleLabel.appendChild(makeRange(-180, 180, 1, this.config.blobNoiseAngle, (v) => {
+      this.config.blobNoiseAngle = v;
+      this.applyBlobStyles();
+    }));
+
+    blobSection.content.appendChild(blobBlurLabel);
+    blobSection.content.appendChild(blobInsetLabel);
+    blobSection.content.appendChild(blobRotateLabel);
+    blobSection.content.appendChild(blobSkewLabel);
+    blobSection.content.appendChild(blobOpacityLabel);
+    blobSection.content.appendChild(blobRadiusALabel);
+    blobSection.content.appendChild(blobRadiusBLabel);
+    blobSection.content.appendChild(blobRadiusCLabel);
+    blobSection.content.appendChild(blobRadiusDLabel);
+    blobSection.content.appendChild(blobAnimateLabel);
+    blobSection.content.appendChild(blobSpeedLabel);
+    blobSection.content.appendChild(blobNoiseScaleLabel);
+    blobSection.content.appendChild(blobNoiseAmplitudeLabel);
+    blobSection.content.appendChild(blobNoiseSpeedLabel);
+    blobSection.content.appendChild(blobNoiseDriftLabel);
+    blobSection.content.appendChild(blobNoisePhaseLabel);
+    blobSection.content.appendChild(blobNoiseAngleLabel);
+    panel.appendChild(blobSection.container);
+
+    // Save & Download section
     panel.appendChild(section('Save / Download'));
 
     const buttonRow = document.createElement('div');
