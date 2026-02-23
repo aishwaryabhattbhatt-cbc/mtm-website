@@ -73,8 +73,13 @@
         </div>
     </nav>
 
-    <!-- Hero Section 10 with Blank Background -->
+    <!-- Hero Section 10 with WebGL Noise Warp Background -->
     <section class="hero-section hero-10">
+        <!-- WebGL Noise Warp Canvas -->
+        <div id="webgl-background" class="webgl-background"></div>
+        
+        <!-- Grain Overlay -->
+        <div class="grain-overlay"></div>
         
         <div class="hero-container">
             <div class="hero-content">
@@ -97,5 +102,16 @@
     </section>
 
     <script src="script.js"></script>
+    
+    <!-- Three.js importmap for ES6 module imports -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js"
+      }
+    }
+    </script>
+    
+    <script type="module" src="hero10-liquid.js"></script>
 </body>
 </html>
