@@ -132,9 +132,9 @@ class LiquidGradientEffect {
       "whiteGroupInfluence": 4,
       "colorGroupInfluence": 2.7,
       "colorWhite": {
-        "r": 0.8235294117647058,
-        "g": 0.8666666666666667,
-        "b": 0.8941176470588236
+        "r": 0.9098039215686274,
+        "g": 0.9098039215686274,
+        "b": 0.9098039215686274
       },
       "colorBlue": {
         "r": 0.196,
@@ -156,15 +156,15 @@ class LiquidGradientEffect {
         "g": 0.34901960784313724,
         "b": 0.6705882352941176
       },
-      "gradientSaturation": 3.39,
-      "gradientBrightness": 1.73,
+      "gradientSaturation": 1.75,
+      "gradientBrightness": 1.5,
       "cellPx": 16,
       "contrast": 5,
       "gamma": 0,
       "softness": 0.01,
       "minR": 0.01,
       "maxR": 0.7,
-      "dotSpacing": 0.07,
+      "dotSpacing": 0.0,
       "lumThreshold": 0,
       "invertDots": true,
       "invert": false,
@@ -182,6 +182,10 @@ class LiquidGradientEffect {
     if (this.config.showMotionGuides === undefined) {
       this.config.showMotionGuides = false;
     }
+    if (this.config.blueInfluence === undefined) this.config.blueInfluence = 1.0;
+    if (this.config.tealInfluence === undefined) this.config.tealInfluence = 1.0;
+    if (this.config.purpleInfluence === undefined) this.config.purpleInfluence = 1.0;
+    if (this.config.pinkInfluence === undefined) this.config.pinkInfluence = 1.0;
     if (this.config.color2GroupInfluence === undefined) {
       this.config.color2GroupInfluence = this.config.blue2Influence ?? this.config.colorGroupInfluence ?? 1.0;
     }
@@ -1142,6 +1146,30 @@ class LiquidGradientEffect {
       this.uniformsLiquid.color2GroupInfluence.value = v;
     }));
 
+    const blueInfluenceLabel = makeLabel('Blue Influence');
+    blueInfluenceLabel.appendChild(makeRange(0.0, 4.0, 0.01, this.config.blueInfluence, (v) => {
+      this.config.blueInfluence = v;
+      this.uniformsLiquid.blueInfluence.value = v;
+    }));
+
+    const tealInfluenceLabel = makeLabel('Teal Influence');
+    tealInfluenceLabel.appendChild(makeRange(0.0, 4.0, 0.01, this.config.tealInfluence, (v) => {
+      this.config.tealInfluence = v;
+      this.uniformsLiquid.tealInfluence.value = v;
+    }));
+
+    const purpleInfluenceLabel = makeLabel('Purple Influence');
+    purpleInfluenceLabel.appendChild(makeRange(0.0, 4.0, 0.01, this.config.purpleInfluence, (v) => {
+      this.config.purpleInfluence = v;
+      this.uniformsLiquid.purpleInfluence.value = v;
+    }));
+
+    const pinkInfluenceLabel = makeLabel('Pink Influence');
+    pinkInfluenceLabel.appendChild(makeRange(0.0, 4.0, 0.01, this.config.pinkInfluence, (v) => {
+      this.config.pinkInfluence = v;
+      this.uniformsLiquid.pinkInfluence.value = v;
+    }));
+
     const saturationLabel = makeLabel('Saturation');
     saturationLabel.appendChild(makeRange(0.0, 4.0, 0.01, this.config.gradientSaturation, (v) => {
       this.config.gradientSaturation = v;
@@ -1174,6 +1202,10 @@ class LiquidGradientEffect {
     colorsSection.content.appendChild(purpleLabel);
     colorsSection.content.appendChild(pinkLabel);
     colorsSection.content.appendChild(color2GroupInfluenceLabel);
+    colorsSection.content.appendChild(blueInfluenceLabel);
+    colorsSection.content.appendChild(tealInfluenceLabel);
+    colorsSection.content.appendChild(purpleInfluenceLabel);
+    colorsSection.content.appendChild(pinkInfluenceLabel);
     colorsSection.content.appendChild(saturationLabel);
     colorsSection.content.appendChild(brightnessLabel);
     colorsSection.content.appendChild(whiteGroupInfluenceLabel);
@@ -1259,6 +1291,12 @@ class LiquidGradientEffect {
       this.uniformsDither.uDotSpacing.value = v;
     }));
 
+    const lumThresholdLabel = makeLabel('Lum Threshold');
+    lumThresholdLabel.appendChild(makeRange(0.0, 1.0, 0.01, this.config.lumThreshold, (v) => {
+      this.config.lumThreshold = v;
+      this.uniformsDither.uLumThreshold.value = v;
+    }));
+
     const ditherToggleLabel = makeLabel('Show Layer');
     ditherToggleLabel.appendChild(makeCheckbox(this.config.showGlyphDither, (v) => {
       this.config.showGlyphDither = v;
@@ -1279,6 +1317,7 @@ class LiquidGradientEffect {
     glyphSection.content.appendChild(minRLabel);
     glyphSection.content.appendChild(maxRLabel);
     glyphSection.content.appendChild(dotSpacingLabel);
+    glyphSection.content.appendChild(lumThresholdLabel);
     glyphSection.content.appendChild(invertLabel);
     panel.appendChild(glyphSection.container);
 
