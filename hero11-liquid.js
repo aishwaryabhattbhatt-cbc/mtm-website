@@ -145,8 +145,8 @@ class LiquidGradientEffect {
       colorTeal: { r: 0.196, g: 0.863, b: 0.784 },
       colorPurple: { r: 0.588, g: 0.314, b: 1.0 },
       colorPink: { r: 0.9686274509803922, g: 0.34901960784313724, b: 0.6705882352941176 },
-      gradientSaturation: 1.89,
-      gradientBrightness: 1.50,
+      gradientSaturation: 1.0,
+      gradientBrightness: 1.0,
       
       // Glyph Dither Controls
       cellPx: 16.0,
