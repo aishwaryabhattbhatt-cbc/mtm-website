@@ -137,8 +137,8 @@ class LiquidGradientEffect {
         "b": 0.8941176470588236
       },
       "colorBlue": {
-        "r": 0.196,
-        "g": 0.392,
+        "r": 0.4,
+        "g": 0.5490196078431373,
         "b": 1
       },
       "colorTeal": {
@@ -162,9 +162,9 @@ class LiquidGradientEffect {
       "contrast": 5,
       "gamma": 0,
       "softness": 0.01,
-      "minR": 0.05,
-      "maxR": 0.48,
-      "dotSpacing": 0.02,
+      "minR": 0.01,
+      "maxR": 0.7,
+      "dotSpacing": 0.04,
       "lumThreshold": 0,
       "invertDots": true,
       "invert": false,
