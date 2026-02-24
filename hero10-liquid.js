@@ -1250,7 +1250,7 @@ class LiquidGradientEffect {
     }));
 
     const maxRLabel = makeLabel('Max Radius');
-    maxRLabel.appendChild(makeRange(0.0, 0.5, 0.01, this.config.maxR, (v) => {
+    maxRLabel.appendChild(makeRange(0.0, 0.7, 0.01, this.config.maxR, (v) => {
       this.uniformsDither.uMaxR.value = v;
     }));
 
